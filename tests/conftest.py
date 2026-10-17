@@ -1,6 +1,8 @@
 # Les fixtures permettent de réutiliser les objets nécessaires à plusieurs tests.
 
 import pytest
+from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 
 from apps.catalog.models import Category, Product
@@ -39,3 +41,40 @@ def user(db):
         email="test-admin@stockflow.local",
         password="Test-password-123",
     )
+
+
+@pytest.fixture
+def user_factory(db):
+    User = get_user_model()
+
+    def make_user(
+        email="user@atlas.ma",
+        password="Strong-Test-Password-2026!",
+        role=User.Role.VIEWER,
+        is_active=True,
+        username=None,
+    ):
+        return User.objects.create_user(
+            email=email,
+            password=password,
+            username=username or email,
+            role=role,
+            is_active=is_active,
+        )
+
+    return make_user
+
+
+@pytest.fixture
+def api_client_for():
+    def make_client(user):
+        client = APIClient()
+
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+
+        client.credentials(HTTP_AUTHORIZATION=f"Bearer {access_token}")
+
+        return client
+
+    return make_client
