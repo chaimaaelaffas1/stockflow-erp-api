@@ -1,8 +1,9 @@
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db import models
 from django.db.models import F, Q
+
 from apps.core.models import TimestampedModel
-from django.conf import settings
 
 
 class Warehouse(TimestampedModel):

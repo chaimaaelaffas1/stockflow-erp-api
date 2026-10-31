@@ -1,6 +1,7 @@
-from apps.core.models import TimestampedModel
 from django.db import models
 from django.db.models import Q
+
+from apps.core.models import TimestampedModel
 
 # Create your models here.
 

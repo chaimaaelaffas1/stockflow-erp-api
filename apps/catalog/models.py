@@ -1,7 +1,8 @@
 from django.db import models
-from apps.core.models import TimestampedModel
-from django.db.models.functions import Lower
 from django.db.models import Q
+from django.db.models.functions import Lower
+
+from apps.core.models import TimestampedModel
 
 # Create your models here.
 

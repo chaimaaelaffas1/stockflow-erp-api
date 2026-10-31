@@ -1,8 +1,7 @@
 import pytest
-
 from django.core.exceptions import PermissionDenied
-from django.db.models import ProtectedError
 from django.db import IntegrityError, transaction
+from django.db.models import ProtectedError
 
 from apps.catalog.models import Product
 from apps.inventory.models import StockLevel, StockMovement
