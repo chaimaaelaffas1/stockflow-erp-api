@@ -6,7 +6,6 @@ from apps.accounts.viewsets import UserViewSet
 
 from .views import LoginView, LogoutView, MeView
 
-
 router = DefaultRouter()
 router.register("users", UserViewSet, basename="users")
 

@@ -1,9 +1,9 @@
 # Les fixtures permettent de réutiliser les objets nécessaires à plusieurs tests.
 
 import pytest
+from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import get_user_model
 
 from apps.catalog.models import Category, Product
 from apps.inventory.models import Warehouse
