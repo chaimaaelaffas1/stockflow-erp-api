@@ -55,6 +55,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "django_filters",
     "drf_spectacular",
+    "drf_spectacular_sidecar",
     "corsheaders",
     "rest_framework_simplejwt.token_blacklist",
 ]
@@ -122,6 +123,24 @@ REST_FRAMEWORK = {
     },
     "EXCEPTION_HANDLER": ("apps.core.handlers.api_exception_handler"),
 }
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "StockFlow ERP API",
+    "DESCRIPTION": """
+    REST API for managing an ERP inventory system.
+
+    Main modules:
+    - Authentication and user management
+    - Customers and suppliers
+    - Product categories and products
+    - Inventory management
+    - Sales and purchases
+    """,
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "REDOC_DIST": "SIDECAR",
+}
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),

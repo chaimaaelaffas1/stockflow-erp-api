@@ -3,6 +3,7 @@ djangorestframework
 djangorestframework-simplejwt
 django-filter
 drf-spectacular
+drf-spectacular[sidecar]
 django-environ
 django-cors-headers
 psycopg[binary]
