@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -13,21 +14,38 @@ from rest_framework_simplejwt.views import (
 from .serializers import MeSerializer
 
 
-class LoginView(TokenObtainPairView):
-    """
-    Connexion par e-mail et mot de passe.
+@extend_schema(
+    tags=["Authentication"],
+    summary="Obtain JWT Tokens",
+    description="""
+    Authenticate a user using their email and password.
 
-    Le champ de connexion est déterminé par User.USERNAME_FIELD.
-    """
+    If the credentials are valid, the API returns an access token
+    and a refresh token.
+
+    The access token must be included in the Authorization header
+    when accessing protected endpoints.
+
+    Only active users are allowed to authenticate.
+    """,
+)
+class LoginView(TokenObtainPairView):
 
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "login"
 
+@extend_schema(
+    tags=["Authentication"],
+    summary="Retrieve Current User Profile",
+    description="""
+    Retrieve the profile information of the currently authenticated user.
+
+    The response contains the current user's account information,
+    including their assigned role.
+    """,
+)
 
 class MeView(RetrieveAPIView):
-    """
-    Renvoie le profil de l'utilisateur actuellement connecté.
-    """
 
     serializer_class = MeSerializer
     permission_classes = [IsAuthenticated]
@@ -35,11 +53,33 @@ class MeView(RetrieveAPIView):
     def get_object(self):
         return self.request.user
 
+@extend_schema(
+    tags=["Authentication"],
+    summary="Logout User",
+    description="""
+    Log out the authenticated user by blacklisting their refresh token.
 
+    Request body:
+    - refresh: The refresh token to invalidate.
+
+    Returns HTTP 204 when the token is successfully blacklisted.
+
+    Returns HTTP 400 if the refresh token is missing or invalid.
+    """,
+    request={
+        "application/json": {
+            "type": "object",
+            "properties": {
+                "refresh": {
+                    "type": "string",
+                    "description": "The refresh token to blacklist.",
+                },
+            },
+            "required": ["refresh"],
+        }
+    },
+)
 class LogoutView(APIView):
-    """
-    Invalide le refresh token fourni dans le corps de la requête.
-    """
 
     permission_classes = [IsAuthenticated]
 

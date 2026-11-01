@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db.models import ProtectedError
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -21,17 +22,62 @@ from apps.catalog.serializers import (
 User = get_user_model()
 
 
+@extend_schema_view(
+    list=extend_schema(
+        tags=["Catalog - Categories"],
+        summary="List Product Categories",
+        description="""
+        Retrieve a list of all product categories.
+
+        Supports searching categories by name.
+
+        All authenticated and active users can access this endpoint.
+        """,
+    ),
+    create=extend_schema(
+        tags=["Catalog - Categories"],
+        summary="Create Product Category",
+        description="""
+        Create a new product category.
+
+        Category names must be unique, regardless of letter casing.
+
+        This operation is available to administrators and stock managers.
+        """,
+    ),
+    retrieve=extend_schema(
+        tags=["Catalog - Categories"],
+        summary="Retrieve Category Details",
+        description="""
+        Retrieve the details of a specific product category
+        using its unique identifier.
+        """,
+    ),
+    partial_update=extend_schema(
+        tags=["Catalog - Categories"],
+        summary="Update Product Category",
+        description="""
+        Partially update an existing product category.
+
+        Only the fields included in the request are modified.
+
+        This operation is available to administrators and stock managers.
+        """,
+    ),
+    destroy=extend_schema(
+        tags=["Catalog - Categories"],
+        summary="Delete Product Category",
+        description="""
+        Permanently delete a product category.
+
+        Only administrators can perform this operation.
+
+        A category cannot be deleted if it is associated with existing
+        products. In that case, the API returns HTTP 409 Conflict.
+        """,
+    ),
+)
 class CategoryViewSet(viewsets.ModelViewSet):
-    """
-    API endpoints for product categories.
-
-    Permissions:
-    - GET: all authenticated and active users
-    - POST: ADMIN, STOCK_MANAGER
-    - PATCH: ADMIN, STOCK_MANAGER
-    - DELETE: ADMIN only
-    """
-
     serializer_class = CategorySerializer
 
     queryset = Category.objects.all().order_by("name")
@@ -91,8 +137,72 @@ class CategoryViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        tags=["Catalog - Products"],
+        summary="List Products",
+        description="""
+        Retrieve a paginated list of products registered in the catalog.
 
+        Available query parameters:
 
+        - search: Search products by SKU or name.
+        - category: Filter products by category ID.
+        - is_active: Filter products by active status.
+        - ordering: Order results by unit_price or name.
+
+        All authenticated and active users can access this endpoint.
+        """,
+    ),
+    create=extend_schema(
+        tags=["Catalog - Products"],
+        summary="Create Product",
+        description="""
+        Create a new product in the catalog.
+
+        Each product must have a unique SKU, a name, a category,
+        and a non-negative unit price.
+
+        The SKU is case-insensitive and must be unique.
+
+        This operation is available to administrators and stock managers.
+        """,
+    ),
+    retrieve=extend_schema(
+        tags=["Catalog - Products"],
+        summary="Retrieve Product Details",
+        description="""
+        Retrieve detailed information about a specific product.
+
+        The response includes product information and its associated category.
+        """,
+    ),
+    partial_update=extend_schema(
+        tags=["Catalog - Products"],
+        summary="Update Product",
+        description="""
+        Partially update an existing product.
+
+        Only the fields included in the request are modified.
+
+        This operation is available to administrators and stock managers.
+        """,
+    ),
+    deactivate=extend_schema(
+        tags=["Catalog - Products"],
+        summary="Deactivate Product",
+        description="""
+        Deactivate a product without permanently deleting it.
+
+        The product remains stored in the database, preserving its
+        historical references.
+
+        This operation is idempotent.
+
+        Returns HTTP 200 with the updated product information.
+        """,
+    ),
+)
 class ProductViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -100,18 +210,6 @@ class ProductViewSet(
     mixins.UpdateModelMixin,
     GenericViewSet,
 ):
-    """
-    API endpoints for products.
-
-    Permissions:
-    - GET: all authenticated and active users
-    - POST: ADMIN, STOCK_MANAGER
-    - PATCH: ADMIN, STOCK_MANAGER
-    - POST deactivate: ADMIN, STOCK_MANAGER
-
-    Product deletion is not exposed by this API.
-    """
-
     serializer_class = ProductSerializer
 
     queryset = Product.objects.select_related("category").all().order_by("sku")
