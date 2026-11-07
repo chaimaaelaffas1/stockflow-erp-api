@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import status
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -30,9 +30,9 @@ from .serializers import MeSerializer
     """,
 )
 class LoginView(TokenObtainPairView):
-
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = "login"
+
 
 @extend_schema(
     tags=["Authentication"],
@@ -44,14 +44,13 @@ class LoginView(TokenObtainPairView):
     including their assigned role.
     """,
 )
-
 class MeView(RetrieveAPIView):
-
     serializer_class = MeSerializer
     permission_classes = [IsAuthenticated]
 
     def get_object(self):
         return self.request.user
+
 
 @extend_schema(
     tags=["Authentication"],
@@ -63,7 +62,6 @@ class MeView(RetrieveAPIView):
     - refresh: The refresh token to invalidate.
 
     Returns HTTP 204 when the token is successfully blacklisted.
-
     Returns HTTP 400 if the refresh token is missing or invalid.
     """,
     request={
@@ -78,9 +76,13 @@ class MeView(RetrieveAPIView):
             "required": ["refresh"],
         }
     },
+    responses={
+        204: None,
+        400: OpenApiResponse(description="Missing or invalid refresh token."),
+        401: OpenApiResponse(description="Authentication required."),
+    },
 )
 class LogoutView(APIView):
-
     permission_classes = [IsAuthenticated]
 
     def post(self, request):

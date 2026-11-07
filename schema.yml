@@ -1,0 +1,2099 @@
+openapi: 3.0.3
+info:
+  title: StockFlow ERP API
+  version: 1.0.0
+  description: "\n    REST API for managing an ERP inventory system.\n\n    Main modules:\n
+    \   - Authentication and user management\n    - Customers and suppliers\n    -
+    Product categories and products\n    - Inventory management\n    - Sales and purchases\n
+    \   "
+paths:
+  /api/v1/auth/logout/:
+    post:
+      operationId: v1_auth_logout_create
+      description: "\n    Log out the authenticated user by blacklisting their refresh
+        token.\n\n    Request body:\n    - refresh: The refresh token to invalidate.\n\n
+        \   Returns HTTP 204 when the token is successfully blacklisted.\n    Returns
+        HTTP 400 if the refresh token is missing or invalid.\n    "
+      summary: Logout User
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh:
+                  type: string
+                  description: The refresh token to blacklist.
+              required:
+              - refresh
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+        '400':
+          description: Missing or invalid refresh token.
+        '401':
+          description: Authentication required.
+  /api/v1/auth/me/:
+    get:
+      operationId: v1_auth_me_retrieve
+      description: "\n    Retrieve the profile information of the currently authenticated
+        user.\n\n    The response contains the current user's account information,\n
+        \   including their assigned role.\n    "
+      summary: Retrieve Current User Profile
+      tags:
+      - Authentication
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Me'
+          description: ''
+  /api/v1/auth/token/:
+    post:
+      operationId: v1_auth_token_create
+      description: "\n    Authenticate a user using their email and password.\n\n
+        \   If the credentials are valid, the API returns an access token\n    and
+        a refresh token.\n\n    The access token must be included in the Authorization
+        header\n    when accessing protected endpoints.\n\n    Only active users are
+        allowed to authenticate.\n    "
+      summary: Obtain JWT Tokens
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/v1/auth/token/refresh/:
+    post:
+      operationId: v1_auth_token_refresh_create
+      description: "\n        Generate a new access token using a valid refresh token.\n\n
+        \       Request body:\n        - refresh: A valid JWT refresh token.\n\n        If
+        refresh token rotation is enabled, a new refresh token\n        may also be
+        returned.\n\n        Returns HTTP 401 if the refresh token is invalid,\n        expired,
+        or blacklisted.\n        "
+      summary: Refresh Access Token
+      tags:
+      - Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/v1/catalog/categories/:
+    get:
+      operationId: v1_catalog_categories_list
+      description: "\n        Retrieve a list of all product categories.\n\n        Supports
+        searching categories by name.\n\n        All authenticated and active users
+        can access this endpoint.\n        "
+      summary: List Product Categories
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Catalog - Categories
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryList'
+          description: ''
+    post:
+      operationId: v1_catalog_categories_create
+      description: "\n        Create a new product category.\n\n        Category names
+        must be unique, regardless of letter casing.\n\n        This operation is
+        available to administrators and stock managers.\n        "
+      summary: Create Product Category
+      tags:
+      - Catalog - Categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Category'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Category'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+  /api/v1/catalog/categories/{id}/:
+    get:
+      operationId: v1_catalog_categories_retrieve
+      description: "\n        Retrieve the details of a specific product category\n
+        \       using its unique identifier.\n        "
+      summary: Retrieve Category Details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - Catalog - Categories
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    patch:
+      operationId: v1_catalog_categories_partial_update
+      description: "\n        Partially update an existing product category.\n\n        Only
+        the fields included in the request are modified.\n\n        This operation
+        is available to administrators and stock managers.\n        "
+      summary: Update Product Category
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - Catalog - Categories
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategory'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategory'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategory'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Category'
+          description: ''
+    delete:
+      operationId: v1_catalog_categories_destroy
+      description: "\n        Permanently delete a product category.\n\n        Only
+        administrators can perform this operation.\n\n        A category cannot be
+        deleted if it is associated with existing\n        products. In that case,
+        the API returns HTTP 409 Conflict.\n        "
+      summary: Delete Product Category
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this category.
+        required: true
+      tags:
+      - Catalog - Categories
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/catalog/products/:
+    get:
+      operationId: v1_catalog_products_list
+      description: "\n        Retrieve a paginated list of products registered in
+        the catalog.\n\n        Available query parameters:\n\n        - search: Search
+        products by SKU or name.\n        - category: Filter products by category
+        ID.\n        - is_active: Filter products by active status.\n        - ordering:
+        Order results by unit_price or name.\n\n        All authenticated and active
+        users can access this endpoint.\n        "
+      summary: List Products
+      parameters:
+      - in: query
+        name: category
+        schema:
+          type: integer
+      - in: query
+        name: category_name
+        schema:
+          type: string
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: price_max
+        schema:
+          type: number
+      - in: query
+        name: price_min
+        schema:
+          type: number
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Catalog - Products
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProductList'
+          description: ''
+    post:
+      operationId: v1_catalog_products_create
+      description: "\n        Create a new product in the catalog.\n\n        Each
+        product must have a unique SKU, a name, a category,\n        and a non-negative
+        unit price.\n\n        The SKU is case-insensitive and must be unique.\n\n
+        \       This operation is available to administrators and stock managers.\n
+        \       "
+      summary: Create Product
+      tags:
+      - Catalog - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /api/v1/catalog/products/{id}/:
+    get:
+      operationId: v1_catalog_products_retrieve
+      description: "\n        Retrieve detailed information about a specific product.\n\n
+        \       The response includes product information and its associated category.\n
+        \       "
+      summary: Retrieve Product Details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this product.
+        required: true
+      tags:
+      - Catalog - Products
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+    patch:
+      operationId: v1_catalog_products_partial_update
+      description: "\n        Partially update an existing product.\n\n        Only
+        the fields included in the request are modified.\n\n        This operation
+        is available to administrators and stock managers.\n        "
+      summary: Update Product
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this product.
+        required: true
+      tags:
+      - Catalog - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProduct'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /api/v1/catalog/products/{id}/deactivate/:
+    post:
+      operationId: v1_catalog_products_deactivate_create
+      description: "\n        Deactivate a product without permanently deleting it.\n\n
+        \       The product remains stored in the database, preserving its\n        historical
+        references.\n\n        This operation is idempotent.\n\n        Returns HTTP
+        200 with the updated product information.\n        "
+      summary: Deactivate Product
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this product.
+        required: true
+      tags:
+      - Catalog - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+          description: ''
+  /api/v1/inventory/stock-adjustments/:
+    post:
+      operationId: v1_inventory_stock_adjustments_create
+      description: "\n        Manually adjust the physical stock quantity\n        of
+        a product in a specific warehouse.\n\n        Required fields:\n\n        -
+        product: Product identifier.\n        - warehouse: Warehouse identifier.\n
+        \       - quantity_delta: Positive or negative quantity.\n        - reason:
+        Mandatory explanation for the adjustment.\n\n        Business rules:\n\n        -
+        The adjustment quantity cannot be zero.\n        - A reason is required.\n
+        \       - Physical stock cannot become negative.\n        - Reserved stock
+        cannot exceed physical stock.\n        - Every successful adjustment creates
+        an immutable stock movement.\n\n        Only administrators and stock managers
+        can perform this operation.\n        "
+      summary: Adjust Stock Quantity
+      tags:
+      - Inventory - Stock Adjustments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StockAdjustmentInput'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/StockAdjustmentInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/StockAdjustmentInput'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovement'
+          description: ''
+        '400':
+          description: Invalid request data.
+        '401':
+          description: Authentication required.
+        '403':
+          description: Insufficient permissions.
+        '409':
+          description: Business rule violation or insufficient stock.
+  /api/v1/inventory/stock-levels/:
+    get:
+      operationId: v1_inventory_stock_levels_list
+      description: "\n        Retrieve a paginated list of stock levels.\n\n        Each
+        stock level represents the quantity of a product\n        stored in a specific
+        warehouse.\n\n        Available query parameters:\n\n        - product: Filter
+        by product ID.\n        - warehouse: Filter by warehouse ID.\n        - low_stock:
+        Return stock levels below a threshold.\n        - threshold: Maximum available
+        quantity for low-stock filtering.\n\n        Available stock is calculated
+        as:\n\n        available = on_hand - reserved.\n\n        All authenticated
+        and active users can access this endpoint.\n        "
+      summary: List Stock Levels
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Inventory - Stock Levels
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStockLevelList'
+          description: ''
+  /api/v1/inventory/stock-levels/{id}/:
+    get:
+      operationId: v1_inventory_stock_levels_retrieve
+      description: "\n        Retrieve the stock level of a specific product\n        in
+        a specific warehouse.\n\n        The response includes physical, reserved
+        and available quantities.\n        "
+      summary: Retrieve Stock Level Details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this stock level.
+        required: true
+      tags:
+      - Inventory - Stock Levels
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockLevel'
+          description: ''
+  /api/v1/inventory/stock-movements/:
+    get:
+      operationId: v1_inventory_stock_movements_list
+      description: "\n        Retrieve the history of stock movements.\n\n        Supported
+        movement types:\n\n        - RECEIPT: Increase physical stock.\n        -
+        SHIPMENT: Decrease physical and reserved stock.\n        - RESERVE: Increase
+        reserved stock.\n        - RELEASE: Decrease reserved stock.\n        - ADJUSTMENT:
+        Correct physical stock.\n\n        Available query parameters:\n\n        -
+        product: Filter by product ID.\n        - warehouse: Filter by warehouse ID.\n
+        \       - movement_type: Filter by movement type.\n        - created_at__gte:
+        Filter by creation date.\n\n        Stock movements are immutable.\n\n        All
+        authenticated and active users can access this endpoint.\n        "
+      summary: List Stock Movements
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Inventory - Stock Movements
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStockMovementList'
+          description: ''
+  /api/v1/inventory/stock-movements/{id}/:
+    get:
+      operationId: v1_inventory_stock_movements_retrieve
+      description: "\n        Retrieve the details of a specific stock movement.\n\n
+        \       This endpoint is read-only.\n        "
+      summary: Retrieve Stock Movement Details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this stock movement.
+        required: true
+      tags:
+      - Inventory - Stock Movements
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockMovement'
+          description: ''
+  /api/v1/inventory/warehouses/:
+    get:
+      operationId: v1_inventory_warehouses_list
+      description: "\n        Retrieve a list of all registered warehouses.\n\n        Only
+        authenticated and active users can access this endpoint.\n        "
+      summary: List Warehouses
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Inventory - Warehouses
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWarehouseList'
+          description: ''
+    post:
+      operationId: v1_inventory_warehouses_create
+      description: "\n        Create a new warehouse.\n\n        Warehouse codes must
+        be unique.\n\n        This operation is available to administrators\n        and
+        stock managers.\n        "
+      summary: Create Warehouse
+      tags:
+      - Inventory - Warehouses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Warehouse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Warehouse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Warehouse'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+          description: ''
+  /api/v1/inventory/warehouses/{id}/:
+    get:
+      operationId: v1_inventory_warehouses_retrieve
+      description: "\n        Retrieve the details of a specific warehouse\n        using
+        its unique identifier.\n        "
+      summary: Retrieve Warehouse Details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this warehouse.
+        required: true
+      tags:
+      - Inventory - Warehouses
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+          description: ''
+    patch:
+      operationId: v1_inventory_warehouses_partial_update
+      description: "\n        Partially update an existing warehouse.\n\n        Only
+        the fields included in the request are modified.\n\n        This operation
+        is available to administrators\n        and stock managers.\n        "
+      summary: Update Warehouse
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this warehouse.
+        required: true
+      tags:
+      - Inventory - Warehouses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedWarehouse'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedWarehouse'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedWarehouse'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Warehouse'
+          description: ''
+  /api/v1/partners/customers/:
+    get:
+      operationId: v1_partners_customers_list
+      description: "\n        Retrieve a paginated list of customers registered in
+        the system.\n\n        Query parameters:\n        - search: Search customers
+        by name, email, or phone number.\n        - is_active: Filter customers by
+        active status.\n        - ordering: Order results by name or creation date.\n\n
+        \       All authenticated and active users can access this endpoint.\n        "
+      summary: List Customers
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Partners - Customers
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCustomerList'
+          description: ''
+    post:
+      operationId: v1_partners_customers_create
+      description: "\n        Register a new customer in the system.\n\n        The
+        request must include the required customer information,\n        such as name
+        and contact details.\n\n        This operation is available to administrators
+        and sales users.\n        "
+      summary: Create Customer
+      tags:
+      - Partners - Customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Customer'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+  /api/v1/partners/customers/{id}/:
+    get:
+      operationId: v1_partners_customers_retrieve
+      description: "\n        Retrieve the complete information of a specific customer\n
+        \       using their unique identifier.\n        "
+      summary: Retrieve Customer Details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this customer.
+        required: true
+      tags:
+      - Partners - Customers
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+    put:
+      operationId: v1_partners_customers_update
+      description: "\n        Replace the editable information of an existing customer.\n\n
+        \       All required fields must be provided in the request.\n        "
+      summary: Update Customer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this customer.
+        required: true
+      tags:
+      - Partners - Customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Customer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Customer'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+    patch:
+      operationId: v1_partners_customers_partial_update
+      description: "\n        Update one or more fields of an existing customer.\n\n
+        \       Only the fields included in the request are modified.\n        "
+      summary: Partially Update Customer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this customer.
+        required: true
+      tags:
+      - Partners - Customers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomer'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomer'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCustomer'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: ''
+    delete:
+      operationId: v1_partners_customers_destroy
+      description: "\n        Permanently delete a customer record.\n\n        This
+        operation is restricted to administrators.\n\n        Deletion is prevented
+        if the customer is associated\n        with existing sales orders.\n        "
+      summary: Delete Customer
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this customer.
+        required: true
+      tags:
+      - Partners - Customers
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/partners/suppliers/:
+    get:
+      operationId: v1_partners_suppliers_list
+      description: "\n        Retrieve a paginated list of suppliers registered in
+        the system.\n\n        Query parameters:\n        - search: Search suppliers
+        by name, email, or phone number.\n        - is_active: Filter suppliers by
+        active status.\n        - ordering: Order results by name or creation date.\n\n
+        \       All authenticated and active users can access this endpoint.\n        "
+      summary: List Suppliers
+      parameters:
+      - in: query
+        name: is_active
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Partners - Suppliers
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSupplierList'
+          description: ''
+    post:
+      operationId: v1_partners_suppliers_create
+      description: "\n        Register a new supplier in the system.\n\n        The
+        request must include the required supplier information\n        and contact
+        details.\n\n        This operation is available to administrators and purchasing
+        users.\n        "
+      summary: Create Supplier
+      tags:
+      - Partners - Suppliers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+  /api/v1/partners/suppliers/{id}/:
+    get:
+      operationId: v1_partners_suppliers_retrieve
+      description: "\n        Retrieve the complete information of a specific supplier\n
+        \       using their unique identifier.\n        "
+      summary: Retrieve Supplier Details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this supplier.
+        required: true
+      tags:
+      - Partners - Suppliers
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+    put:
+      operationId: v1_partners_suppliers_update
+      description: "\n        Replace the editable information of an existing supplier.\n\n
+        \       All required fields must be provided in the request.\n        "
+      summary: Update Supplier
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this supplier.
+        required: true
+      tags:
+      - Partners - Suppliers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+    patch:
+      operationId: v1_partners_suppliers_partial_update
+      description: "\n        Update one or more fields of an existing supplier.\n\n
+        \       Only the fields included in the request are modified.\n        "
+      summary: Partially Update Supplier
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this supplier.
+        required: true
+      tags:
+      - Partners - Suppliers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSupplier'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSupplier'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSupplier'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Supplier'
+          description: ''
+    delete:
+      operationId: v1_partners_suppliers_destroy
+      description: "\n        Permanently delete a supplier record.\n\n        This
+        operation is restricted to administrators.\n\n        Deletion is prevented
+        if the supplier is associated\n        with existing purchase orders.\n        "
+      summary: Delete Supplier
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this supplier.
+        required: true
+      tags:
+      - Partners - Suppliers
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/users/:
+    get:
+      operationId: v1_users_list
+      description: "\n        Retrieve a paginated list of user accounts registered
+        in the system.\n\n        Only administrators can access this endpoint.\n
+        \       "
+      summary: List All Users
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: v1_users_create
+      description: "\n        Create a new user account.\n\n        Administrators
+        can assign a role to the new user.\n\n        Supported roles:\n        -
+        ADMIN\n        - STOCK_MANAGER\n        - SALES\n        - PURCHASER\n        -
+        VIEWER\n\n        The password is securely hashed before being stored.\n        "
+      summary: Create User
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/users/{id}/:
+    get:
+      operationId: v1_users_retrieve
+      description: "\n        Retrieve the information of a specific user using their
+        unique ID.\n\n        Only administrators can access this endpoint.\n        "
+      summary: Retrieve User Details
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - Users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: v1_users_update
+      description: "\n        Replace the editable information of an existing user.\n\n
+        \       Only administrators can perform this operation.\n        "
+      summary: Update User
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: v1_users_partial_update
+      description: "\n        Partially update an existing user account.\n\n        Only
+        the fields included in the request are modified.\n\n        Only administrators
+        can perform this operation.\n        "
+      summary: Partially Update User
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - updated_at
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        email:
+          nullable: true
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          nullable: true
+          maxLength: 30
+        address:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - updated_at
+    Me:
+      type: object
+      description: Informations non sensibles de l'utilisateur connecté.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        first_name:
+          type: string
+          readOnly: true
+        last_name:
+          type: string
+          readOnly: true
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+          readOnly: true
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+      required:
+      - email
+      - first_name
+      - id
+      - is_active
+      - last_name
+      - role
+      - username
+    MovementTypeEnum:
+      enum:
+      - RECEIPT
+      - SHIPMENT
+      - RESERVE
+      - RELEASE
+      - ADJUSTMENT
+      type: string
+      description: |-
+        * `RECEIPT` - Réception
+        * `SHIPMENT` - Expédition
+        * `RESERVE` - Réservation
+        * `RELEASE` - Libération
+        * `ADJUSTMENT` - Ajustement
+    PaginatedCategoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Category'
+    PaginatedCustomerList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Customer'
+    PaginatedProductList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+    PaginatedStockLevelList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockLevel'
+    PaginatedStockMovementList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockMovement'
+    PaginatedSupplierList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Supplier'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PaginatedWarehouseList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Warehouse'
+    PatchedCategory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedCustomer:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        email:
+          nullable: true
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          nullable: true
+          maxLength: 30
+        address:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedProduct:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        sku:
+          type: string
+          maxLength: 40
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        category:
+          type: integer
+        category_name:
+          type: string
+          readOnly: true
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        is_active:
+          type: boolean
+        reorder_level:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedSupplier:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        email:
+          nullable: true
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          nullable: true
+          maxLength: 30
+        address:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        password:
+          type: string
+          writeOnly: true
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedWarehouse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 100
+        is_active:
+          type: boolean
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        sku:
+          type: string
+          maxLength: 40
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        category:
+          type: integer
+        category_name:
+          type: string
+          readOnly: true
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        is_active:
+          type: boolean
+        reorder_level:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - category
+      - category_name
+      - created_at
+      - id
+      - name
+      - sku
+      - unit_price
+      - updated_at
+    RoleEnum:
+      enum:
+      - ADMIN
+      - STOCK_MANAGER
+      - SALES
+      - PURCHASER
+      - VIEWER
+      type: string
+      description: |-
+        * `ADMIN` - Administrator
+        * `STOCK_MANAGER` - Stock Manager
+        * `SALES` - Sales Representative
+        * `PURCHASER` - Purchasing Manager
+        * `VIEWER` - Viewer
+    StockAdjustmentInput:
+      type: object
+      properties:
+        product:
+          type: integer
+        warehouse:
+          type: integer
+        quantity_delta:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+        reason:
+          type: string
+      required:
+      - product
+      - quantity_delta
+      - reason
+      - warehouse
+    StockLevel:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product:
+          type: integer
+        warehouse:
+          type: integer
+        on_hand:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+        reserved:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+        available:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - available
+      - id
+      - product
+      - updated_at
+      - warehouse
+    StockMovement:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product:
+          type: integer
+          readOnly: true
+        warehouse:
+          type: integer
+          readOnly: true
+        movement_type:
+          allOf:
+          - $ref: '#/components/schemas/MovementTypeEnum'
+          readOnly: true
+        on_hand_delta:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+          readOnly: true
+        reserved_delta:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+          readOnly: true
+        reference:
+          type: string
+          readOnly: true
+        reason:
+          type: string
+          readOnly: true
+        created_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - created_by
+      - id
+      - movement_type
+      - on_hand_delta
+      - product
+      - reason
+      - reference
+      - reserved_delta
+      - warehouse
+    Supplier:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 200
+        email:
+          nullable: true
+          oneOf:
+          - type: string
+            format: email
+            maxLength: 254
+          - type: string
+            maxLength: 0
+        phone:
+          type: string
+          nullable: true
+          maxLength: 30
+        address:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - name
+      - updated_at
+    TokenObtainPair:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - email
+      - password
+      - refresh
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        password:
+          type: string
+          writeOnly: true
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - date_joined
+      - email
+      - id
+      - password
+      - username
+    Warehouse:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        code:
+          type: string
+          maxLength: 20
+        name:
+          type: string
+          maxLength: 100
+        is_active:
+          type: boolean
+      required:
+      - code
+      - id
+      - name
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

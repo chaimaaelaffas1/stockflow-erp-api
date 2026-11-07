@@ -4,46 +4,52 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
+from apps.core.exceptions import BusinessRuleError
+
 
 def api_exception_handler(exc, context):
-
-    # Case 1: Resource is protected by another model
+    # Case 1: Database foreign key protection
     if isinstance(exc, ProtectedError):
         return Response(
             {
                 "error": {
                     "code": "resource_in_use",
-                    "message": ("This resource is referenced and cannot be deleted."),
+                    "message": "This resource is referenced and cannot be deleted.",
                     "details": {},
                 }
             },
             status=status.HTTP_409_CONFLICT,
         )
 
-    # Case 2: Let DRF handle standard exceptions
+    # Case 2: Custom business rule violations
+    if isinstance(exc, BusinessRuleError):
+        return Response(
+            {
+                "error": {
+                    "code": exc.code,
+                    "message": exc.message,
+                    "details": exc.details,
+                }
+            },
+            status=status.HTTP_409_CONFLICT,
+        )
+
+    # Case 3: Standard DRF exceptions
     response = exception_handler(exc, context)
 
-    # Case 3: Unknown exception
+    # Case 4: Unhandled server errors (500)
     if response is None:
         return None
 
-    # Case 4: Validation errors
+    # Case 5: Format standard DRF error responses
     if isinstance(exc, ValidationError):
         code = "validation_error"
         message = "Validation failed."
-
     else:
-        code = getattr(
-            exc,
-            "default_code",
-            "request_error",
-        )
-
+        code = getattr(exc, "default_code", "request_error")
         message = "Request failed."
 
-    # Keep original error details
     details = response.data
-
     response.data = {
         "error": {
             "code": code,
