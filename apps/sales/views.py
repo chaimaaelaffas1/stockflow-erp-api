@@ -38,9 +38,14 @@ from .services import (
         summary="Create a sales order",
         description="Creates a new sales order in DRAFT status.",
     ),
-    partial_update=extend_schema(
+    update=extend_schema(
         tags=["Sales Orders"],
         summary="Update a draft sales order",
+        description="Only DRAFT orders can be modified.",
+    ),
+    partial_update=extend_schema(
+        tags=["Sales Orders"],
+        summary="Partially update a draft sales order",
         description="Only DRAFT orders can be modified.",
     ),
     destroy=extend_schema(
@@ -117,7 +122,6 @@ class SalesOrderViewSet(ModelViewSet):
             order = self.get_object()
 
             if order.status != SalesOrder.Status.DRAFT:
-
                 raise InvalidTransition(
                     "Only DRAFT orders can be modified.",
                     {"current_status": order.status},
@@ -146,7 +150,6 @@ class SalesOrderViewSet(ModelViewSet):
             order = self.get_object()
 
             if order.status != SalesOrder.Status.DRAFT:
-
                 raise InvalidTransition(
                     "Only DRAFT orders can be deleted.",
                     {"current_status": order.status},

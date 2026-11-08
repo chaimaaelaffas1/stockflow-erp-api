@@ -1167,6 +1167,311 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/sales/sales-orders/:
+    get:
+      operationId: v1_sales_sales_orders_list
+      description: Returns the list of customer sales orders.
+      summary: List sales orders
+      parameters:
+      - in: query
+        name: created_at__gte
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: customer
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - CANCELLED
+          - CONFIRMED
+          - DRAFT
+          - SHIPPED
+        description: |-
+          * `DRAFT` - Draft
+          * `CONFIRMED` - Confirmed
+          * `SHIPPED` - Shipped
+          * `CANCELLED` - Cancelled
+      tags:
+      - Sales Orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSalesOrderList'
+          description: ''
+    post:
+      operationId: v1_sales_sales_orders_create
+      description: Creates a new sales order in DRAFT status.
+      summary: Create a sales order
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+  /api/v1/sales/sales-orders/{id}/:
+    get:
+      operationId: v1_sales_sales_orders_retrieve
+      summary: Retrieve a sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+    put:
+      operationId: v1_sales_sales_orders_update
+      description: Only DRAFT orders can be modified.
+      summary: Update a draft sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+    patch:
+      operationId: v1_sales_sales_orders_partial_update
+      description: Only DRAFT orders can be modified.
+      summary: Partially update a draft sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSalesOrder'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+    delete:
+      operationId: v1_sales_sales_orders_destroy
+      description: Only DRAFT orders can be deleted.
+      summary: Delete a draft sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/sales/sales-orders/{id}/cancel/:
+    post:
+      operationId: v1_sales_sales_orders_cancel_create
+      description: Cancels a DRAFT or CONFIRMED order. A CONFIRMED order releases
+        its reserved stock.
+      summary: Cancel a sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+  /api/v1/sales/sales-orders/{id}/confirm/:
+    post:
+      operationId: v1_sales_sales_orders_confirm_create
+      description: Confirms a DRAFT order, reserves stock and freezes product prices.
+      summary: Confirm a sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+  /api/v1/sales/sales-orders/{id}/ship/:
+    post:
+      operationId: v1_sales_sales_orders_ship_create
+      description: Ships a CONFIRMED order, decreases physical stock and releases
+        reserved quantities.
+      summary: Ship a sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
   /api/v1/users/:
     get:
       operationId: v1_users_list
@@ -1519,6 +1824,29 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Product'
+    PaginatedSalesOrderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesOrder'
     PaginatedStockLevelList:
       type: object
       required:
@@ -1721,6 +2049,67 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedSalesOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        number:
+          type: string
+          readOnly: true
+          nullable: true
+        customer:
+          type: integer
+        customer_name:
+          type: string
+          readOnly: true
+        warehouse:
+          type: integer
+        warehouse_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        notes:
+          type: string
+        created_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        confirmed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        shipped_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesOrderLine'
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,21}(?:\.\d{0,3})?$
+          readOnly: true
     PatchedSupplier:
       type: object
       properties:
@@ -1863,6 +2252,128 @@ components:
         * `SALES` - Sales Representative
         * `PURCHASER` - Purchasing Manager
         * `VIEWER` - Viewer
+    SalesOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        number:
+          type: string
+          readOnly: true
+          nullable: true
+        customer:
+          type: integer
+        customer_name:
+          type: string
+          readOnly: true
+        warehouse:
+          type: integer
+        warehouse_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/StatusEnum'
+          readOnly: true
+        notes:
+          type: string
+        created_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        confirmed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        shipped_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesOrderLine'
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,21}(?:\.\d{0,3})?$
+          readOnly: true
+      required:
+      - cancelled_at
+      - confirmed_at
+      - created_at
+      - created_by
+      - customer
+      - customer_name
+      - id
+      - lines
+      - number
+      - shipped_at
+      - status
+      - total
+      - updated_at
+      - warehouse
+      - warehouse_name
+    SalesOrderLine:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product:
+          type: integer
+        product_name:
+          type: string
+          readOnly: true
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        line_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,21}(?:\.\d{0,3})?$
+          readOnly: true
+      required:
+      - id
+      - line_total
+      - product
+      - product_name
+      - quantity
+      - unit_price
+    StatusEnum:
+      enum:
+      - DRAFT
+      - CONFIRMED
+      - SHIPPED
+      - CANCELLED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `CONFIRMED` - Confirmed
+        * `SHIPPED` - Shipped
+        * `CANCELLED` - Cancelled
     StockAdjustmentInput:
       type: object
       properties:

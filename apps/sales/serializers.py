@@ -10,6 +10,12 @@ class SalesOrderLineSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
+    line_total = serializers.DecimalField(
+        max_digits=24,
+        decimal_places=3,
+        read_only=True,
+    )
+
     class Meta:
         model = SalesOrderLine
         fields = [
@@ -38,6 +44,12 @@ class SalesOrderSerializer(serializers.ModelSerializer):
 
     warehouse_name = serializers.CharField(
         source="warehouse.name",
+        read_only=True,
+    )
+
+    total = serializers.DecimalField(
+        max_digits=24,
+        decimal_places=3,
         read_only=True,
     )
 

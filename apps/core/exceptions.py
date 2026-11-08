@@ -27,3 +27,27 @@ class InsufficientStock(BusinessRuleError):
     """
 
     code = "insufficient_stock"
+
+
+class OverReceipt(BusinessRuleError):
+    """
+    Raised when received quantity exceeds ordered quantity.
+    """
+
+    code = "over_receipt"
+
+
+class EmptyOrder(BusinessRuleError):
+    """
+    Raised when trying to place an order without lines.
+    """
+
+    code = "empty_order"
+
+
+class IdempotencyConflict(BusinessRuleError):
+    """
+    Raised when an idempotency key is reused with another payload.
+    """
+
+    code = "idempotency_conflict"
