@@ -109,7 +109,7 @@ class SalesOrderLine(models.Model):
     quantity = models.DecimalField(
         max_digits=12,
         decimal_places=3,
-        validators=[MinValueValidator(0.001)],
+        validators=[MinValueValidator(Decimal("0.001"))],
     )
 
     unit_price = models.DecimalField(
