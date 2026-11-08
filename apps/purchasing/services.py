@@ -226,12 +226,13 @@ def receive_purchase_order(
 
         # 6. Create the receipt.
         try:
-            receipt = Receipt.objects.create(
-                purchase_order=order,
-                idempotency_key=idempotency_key,
-                request_hash=request_hash,
-                received_by=user,
-            )
+            with transaction.atomic():
+                receipt = Receipt.objects.create(
+                    purchase_order=order,
+                    idempotency_key=idempotency_key,
+                    request_hash=request_hash,
+                    received_by=user,
+                )
 
         except IntegrityError:
             # A concurrent request may have created the same key.

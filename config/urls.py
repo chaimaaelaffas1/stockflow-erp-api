@@ -33,6 +33,10 @@ urlpatterns = [
         "api/v1/sales/",
         include("apps.sales.urls"),
     ),
+    path(
+        "api/v1/purchasing/",
+        include("apps.purchasing.urls"),
+    ),
     # OpenAPI schema
     path(
         "api/schema/",
