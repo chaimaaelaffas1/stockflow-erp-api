@@ -1,5 +1,7 @@
 # Les fixtures permettent de réutiliser les objets nécessaires à plusieurs tests.
 
+from decimal import Decimal
+
 import pytest
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
@@ -20,7 +22,7 @@ def product(db, category):
         sku="TEST-001",
         name="Produit test",
         category=category,
-        unit_price="100.00",
+        unit_price=Decimal("100.00"),
     )
 
 
