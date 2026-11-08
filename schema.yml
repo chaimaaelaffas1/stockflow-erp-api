@@ -1167,6 +1167,768 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/v1/purchasing/purchase-orders/:
+    get:
+      operationId: v1_purchasing_purchase_orders_list
+      description: Retrieve all purchase orders. Available to authenticated and active
+        users.
+      summary: List purchase orders
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Purchasing
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPurchaseOrderReadList'
+          description: ''
+        '401':
+          description: Authentication credentials were not provided.
+    post:
+      operationId: v1_purchasing_purchase_orders_create
+      description: "\nCreate a purchase order in DRAFT status.\n\nOnly ADMIN and PURCHASER
+        roles can create purchase orders.\n\nThe order can contain multiple products.
+        It can be created without\nlines, but it cannot be placed until it contains
+        at least one line.\n        "
+      summary: Create a purchase order
+      tags:
+      - Purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderWrite'
+            examples:
+              CreatePurchaseOrder:
+                value:
+                  supplier: 1
+                  warehouse: 1
+                  lines:
+                  - product: 1
+                    quantity_ordered: '25.000'
+                    unit_cost: '50.00'
+                  - product: 2
+                    quantity_ordered: '10.000'
+                    unit_cost: '120.00'
+                summary: Create purchase order
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrderRead'
+          description: ''
+        '400':
+          description: Invalid input data.
+        '403':
+          description: Insufficient permissions.
+  /api/v1/purchasing/purchase-orders/{id}/:
+    get:
+      operationId: v1_purchasing_purchase_orders_retrieve
+      description: Retrieve one purchase order with its lines.
+      summary: Retrieve a purchase order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this purchase order.
+        required: true
+      tags:
+      - Purchasing
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrderRead'
+          description: ''
+        '404':
+          description: Purchase order not found.
+        '401':
+          description: Authentication required.
+    put:
+      operationId: v1_purchasing_purchase_orders_update
+      description: Replace the editable fields of a purchase order. Only DRAFT orders
+        can be updated.
+      summary: Replace a draft purchase order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this purchase order.
+        required: true
+      tags:
+      - Purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PurchaseOrderWrite'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrderRead'
+          description: ''
+        '400':
+          description: Invalid input data.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Purchase order not found.
+        '409':
+          description: Order is not in DRAFT status.
+    patch:
+      operationId: v1_purchasing_purchase_orders_partial_update
+      description: Update selected fields of a DRAFT purchase order.
+      summary: Partially update a draft purchase order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this purchase order.
+        required: true
+      tags:
+      - Purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPurchaseOrderWrite'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPurchaseOrderWrite'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPurchaseOrderWrite'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrderRead'
+          description: ''
+        '400':
+          description: Invalid input data.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Purchase order not found.
+        '409':
+          description: Order is not in DRAFT status.
+    delete:
+      operationId: v1_purchasing_purchase_orders_destroy
+      description: Delete a purchase order only while it is in DRAFT status.
+      summary: Delete a draft purchase order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this purchase order.
+        required: true
+      tags:
+      - Purchasing
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: Purchase order deleted.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Purchase order not found.
+        '409':
+          description: Order is not in DRAFT status.
+  /api/v1/purchasing/purchase-orders/{id}/cancel/:
+    post:
+      operationId: v1_purchasing_purchase_orders_cancel_create
+      description: "\n    Cancel a purchase order.\n    \n    Cancellation is allowed
+        only when:\n    - The order is in DRAFT or ORDERED status.\n    - No quantity
+        has been received.\n    \n    A partially received or fully received order
+        cannot be cancelled.\n            "
+      summary: Cancel a purchase order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this purchase order.
+        required: true
+      tags:
+      - Purchasing
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrderRead'
+          description: ''
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Purchase order not found.
+        '409':
+          description: Invalid transition.
+  /api/v1/purchasing/purchase-orders/{id}/place/:
+    post:
+      operationId: v1_purchasing_purchase_orders_place_create
+      description: "\n    Transition a purchase order from DRAFT to ORDERED.\n    \n
+        \   Business rules:\n    - The purchase order must be in DRAFT status.\n    -
+        The supplier must be active.\n    - The warehouse must be active.\n    - The
+        purchase order must contain at least one line.\n    \n    No stock movement
+        is created when placing an order.\n            "
+      summary: Place a purchase order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this purchase order.
+        required: true
+      tags:
+      - Purchasing
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PurchaseOrderRead'
+              examples:
+                PlacedOrderResponse:
+                  value:
+                    id: 1
+                    number: PO-A12B34C56D78
+                    supplier: 1
+                    supplier_name: Supplier Test
+                    warehouse: 1
+                    warehouse_name: Main Warehouse
+                    status: ORDERED
+                    ordered_at: '2026-11-08T10:00:00Z'
+                    lines: []
+                  summary: Placed order response
+          description: ''
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Purchase order not found.
+        '409':
+          description: Invalid transition or empty purchase order.
+  /api/v1/purchasing/purchase-orders/{id}/receive/:
+    post:
+      operationId: v1_purchasing_purchase_orders_receive_create
+      description: "\n    Register a goods receipt for a purchase order.\n    \n    Only
+        ADMIN and STOCK_MANAGER roles can perform this operation.\n    \n    Business
+        rules:\n    - The order must be ORDERED or PARTIALLY_RECEIVED.\n    - Each
+        purchase order line must belong to the specified order.\n    - Received quantity
+        must be positive.\n    - Total received quantity cannot exceed ordered quantity.\n
+        \   - The stock is updated through the inventory service.\n    - A StockMovement
+        with type RECEIPT is created.\n    - The same idempotency key and payload
+        return the existing receipt.\n    - Reusing an idempotency key with a different
+        payload returns HTTP 409.\n    \n    The operation is atomic: if one line
+        fails validation, no stock or receipt\n    changes are committed.\n            "
+      summary: Receive goods for a purchase order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this purchase order.
+        required: true
+      tags:
+      - Purchasing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReceiveInput'
+            examples:
+              PartialReceipt:
+                value:
+                  idempotency_key: b0d9bdf5-6479-4a7c-93fb-1f92bce1f126
+                  lines:
+                  - purchase_order_line: 1
+                    quantity: '10.000'
+                summary: Partial receipt
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ReceiveInput'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ReceiveInput'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiptRead'
+              examples:
+                CompleteReceiptResponse:
+                  value:
+                    id: 1
+                    purchase_order: 1
+                    purchase_order_number: PO-A12B34C56D78
+                    idempotency_key: b0d9bdf5-6479-4a7c-93fb-1f92bce1f126
+                    received_by: 2
+                    lines:
+                    - id: 1
+                      purchase_order_line: 1
+                      product_name: Product Test
+                      product_sku: TEST-001
+                      quantity: '10.000'
+                  summary: Complete receipt response
+          description: ''
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiptRead'
+          description: Existing receipt returned (idempotent replay).
+        '400':
+          description: Invalid request data.
+        '403':
+          description: Insufficient permissions.
+        '404':
+          description: Purchase order not found.
+        '409':
+          description: Invalid transition, over-receipt, or idempotency key conflict.
+  /api/v1/purchasing/receipts/:
+    get:
+      operationId: v1_purchasing_receipts_list
+      description: "\nRetrieve all goods receipts.\n\nEach receipt contains:\n- Purchase
+        order reference\n- Idempotency key\n- User who received the goods\n- Receipt
+        date\n- Received product quantities\n        "
+      summary: List goods receipts
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Receipts
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReceiptReadList'
+          description: ''
+        '401':
+          description: Authentication required.
+  /api/v1/purchasing/receipts/{id}/:
+    get:
+      operationId: v1_purchasing_receipts_retrieve
+      description: Retrieve one receipt with all its receipt lines.
+      summary: Retrieve a goods receipt
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this receipt.
+        required: true
+      tags:
+      - Receipts
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReceiptRead'
+          description: ''
+        '401':
+          description: Authentication required.
+        '404':
+          description: Receipt not found.
+  /api/v1/sales/sales-orders/:
+    get:
+      operationId: v1_sales_sales_orders_list
+      description: Returns the list of customer sales orders.
+      summary: List sales orders
+      parameters:
+      - in: query
+        name: created_at__gte
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: customer
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - CANCELLED
+          - CONFIRMED
+          - DRAFT
+          - SHIPPED
+        description: |-
+          * `DRAFT` - Draft
+          * `CONFIRMED` - Confirmed
+          * `SHIPPED` - Shipped
+          * `CANCELLED` - Cancelled
+      tags:
+      - Sales Orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSalesOrderList'
+          description: ''
+    post:
+      operationId: v1_sales_sales_orders_create
+      description: Creates a new sales order in DRAFT status.
+      summary: Create a sales order
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+  /api/v1/sales/sales-orders/{id}/:
+    get:
+      operationId: v1_sales_sales_orders_retrieve
+      summary: Retrieve a sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+    put:
+      operationId: v1_sales_sales_orders_update
+      description: Only DRAFT orders can be modified.
+      summary: Update a draft sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+    patch:
+      operationId: v1_sales_sales_orders_partial_update
+      description: Only DRAFT orders can be modified.
+      summary: Partially update a draft sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSalesOrder'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+    delete:
+      operationId: v1_sales_sales_orders_destroy
+      description: Only DRAFT orders can be deleted.
+      summary: Delete a draft sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/sales/sales-orders/{id}/cancel/:
+    post:
+      operationId: v1_sales_sales_orders_cancel_create
+      description: Cancels a DRAFT or CONFIRMED order. A CONFIRMED order releases
+        its reserved stock.
+      summary: Cancel a sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+  /api/v1/sales/sales-orders/{id}/confirm/:
+    post:
+      operationId: v1_sales_sales_orders_confirm_create
+      description: Confirms a DRAFT order, reserves stock and freezes product prices.
+      summary: Confirm a sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
+  /api/v1/sales/sales-orders/{id}/ship/:
+    post:
+      operationId: v1_sales_sales_orders_ship_create
+      description: Ships a CONFIRMED order, decreases physical stock and releases
+        reserved quantities.
+      summary: Ship a sales order
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this sales order.
+        required: true
+      tags:
+      - Sales Orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SalesOrder'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesOrder'
+          description: ''
   /api/v1/users/:
     get:
       operationId: v1_users_list
@@ -1519,6 +2281,75 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Product'
+    PaginatedPurchaseOrderReadList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseOrderRead'
+    PaginatedReceiptReadList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceiptRead'
+    PaginatedSalesOrderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesOrder'
     PaginatedStockLevelList:
       type: object
       required:
@@ -1721,6 +2552,81 @@ components:
           type: string
           format: date-time
           readOnly: true
+    PatchedPurchaseOrderWrite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        supplier:
+          type: integer
+        warehouse:
+          type: integer
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseOrderLineWrite'
+    PatchedSalesOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        number:
+          type: string
+          readOnly: true
+          nullable: true
+        customer:
+          type: integer
+        customer_name:
+          type: string
+          readOnly: true
+        warehouse:
+          type: integer
+        warehouse_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SalesOrderStatusEnum'
+          readOnly: true
+        notes:
+          type: string
+        created_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        confirmed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        shipped_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesOrderLine'
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,21}(?:\.\d{0,3})?$
+          readOnly: true
     PatchedSupplier:
       type: object
       properties:
@@ -1849,6 +2755,239 @@ components:
       - sku
       - unit_price
       - updated_at
+    PurchaseOrderLineRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product:
+          type: integer
+        product_name:
+          type: string
+          readOnly: true
+        product_sku:
+          type: string
+          readOnly: true
+        quantity_ordered:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+        quantity_received:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+        quantity_remaining:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+          readOnly: true
+        unit_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - id
+      - product
+      - product_name
+      - product_sku
+      - quantity_ordered
+      - quantity_remaining
+      - unit_cost
+    PurchaseOrderLineWrite:
+      type: object
+      properties:
+        product:
+          type: integer
+        quantity_ordered:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+        unit_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+      required:
+      - product
+      - quantity_ordered
+      - unit_cost
+    PurchaseOrderRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        number:
+          type: string
+          readOnly: true
+        supplier:
+          type: integer
+          readOnly: true
+        supplier_name:
+          type: string
+          readOnly: true
+        warehouse:
+          type: integer
+          readOnly: true
+        warehouse_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PurchaseOrderReadStatusEnum'
+          readOnly: true
+        ordered_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseOrderLineRead'
+          readOnly: true
+      required:
+      - created_at
+      - created_by
+      - id
+      - lines
+      - number
+      - ordered_at
+      - status
+      - supplier
+      - supplier_name
+      - updated_at
+      - warehouse
+      - warehouse_name
+    PurchaseOrderReadStatusEnum:
+      enum:
+      - DRAFT
+      - ORDERED
+      - PARTIALLY_RECEIVED
+      - RECEIVED
+      - CANCELLED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `ORDERED` - Ordered
+        * `PARTIALLY_RECEIVED` - Partially Received
+        * `RECEIVED` - Received
+        * `CANCELLED` - Cancelled
+    PurchaseOrderWrite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        supplier:
+          type: integer
+        warehouse:
+          type: integer
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/PurchaseOrderLineWrite'
+      required:
+      - id
+      - supplier
+      - warehouse
+    ReceiptLineRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        purchase_order_line:
+          type: integer
+        product_name:
+          type: string
+          readOnly: true
+        product_sku:
+          type: string
+          readOnly: true
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+      required:
+      - id
+      - product_name
+      - product_sku
+      - purchase_order_line
+      - quantity
+    ReceiptRead:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        purchase_order:
+          type: integer
+          readOnly: true
+        purchase_order_number:
+          type: string
+          readOnly: true
+        idempotency_key:
+          type: string
+          format: uuid
+          readOnly: true
+        received_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceiptLineRead'
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - idempotency_key
+      - lines
+      - purchase_order
+      - purchase_order_number
+      - received_by
+    ReceiveInput:
+      type: object
+      properties:
+        idempotency_key:
+          type: string
+          format: uuid
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceiveLineInput'
+      required:
+      - idempotency_key
+      - lines
+    ReceiveLineInput:
+      type: object
+      properties:
+        purchase_order_line:
+          type: integer
+          minimum: 1
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+      required:
+      - purchase_order_line
+      - quantity
     RoleEnum:
       enum:
       - ADMIN
@@ -1863,6 +3002,128 @@ components:
         * `SALES` - Sales Representative
         * `PURCHASER` - Purchasing Manager
         * `VIEWER` - Viewer
+    SalesOrder:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        number:
+          type: string
+          readOnly: true
+          nullable: true
+        customer:
+          type: integer
+        customer_name:
+          type: string
+          readOnly: true
+        warehouse:
+          type: integer
+        warehouse_name:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SalesOrderStatusEnum'
+          readOnly: true
+        notes:
+          type: string
+        created_by:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        confirmed_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        shipped_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        cancelled_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        lines:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesOrderLine'
+        total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,21}(?:\.\d{0,3})?$
+          readOnly: true
+      required:
+      - cancelled_at
+      - confirmed_at
+      - created_at
+      - created_by
+      - customer
+      - customer_name
+      - id
+      - lines
+      - number
+      - shipped_at
+      - status
+      - total
+      - updated_at
+      - warehouse
+      - warehouse_name
+    SalesOrderLine:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        product:
+          type: integer
+        product_name:
+          type: string
+          readOnly: true
+        quantity:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,9}(?:\.\d{0,3})?$
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+          nullable: true
+        line_total:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,21}(?:\.\d{0,3})?$
+          readOnly: true
+      required:
+      - id
+      - line_total
+      - product
+      - product_name
+      - quantity
+      - unit_price
+    SalesOrderStatusEnum:
+      enum:
+      - DRAFT
+      - CONFIRMED
+      - SHIPPED
+      - CANCELLED
+      type: string
+      description: |-
+        * `DRAFT` - Draft
+        * `CONFIRMED` - Confirmed
+        * `SHIPPED` - Shipped
+        * `CANCELLED` - Cancelled
     StockAdjustmentInput:
       type: object
       properties:
