@@ -16,6 +16,7 @@ from apps.inventory.services import (
     adjust_stock,
     apply_stock_change,
 )
+from tests.helpers import assert_ledger_consistent
 
 
 @pytest.mark.django_db
@@ -276,3 +277,46 @@ def test_apply_stock_change_requires_transaction(
             on_hand_delta=Decimal("5"),
             user=user,
         )
+
+
+@pytest.mark.django_db
+def test_ledger_consistency_after_stock_operations(
+    product,
+    warehouse,
+    user,
+):
+    with transaction.atomic():
+        apply_stock_change(
+            product_id=product.pk,
+            warehouse_id=warehouse.pk,
+            movement_type="RECEIPT",
+            on_hand_delta=Decimal("20"),
+            user=user,
+        )
+
+        apply_stock_change(
+            product_id=product.pk,
+            warehouse_id=warehouse.pk,
+            movement_type="RESERVE",
+            reserved_delta=Decimal("5"),
+            user=user,
+        )
+
+        apply_stock_change(
+            product_id=product.pk,
+            warehouse_id=warehouse.pk,
+            movement_type="RELEASE",
+            reserved_delta=Decimal("-2"),
+            user=user,
+        )
+
+        apply_stock_change(
+            product_id=product.pk,
+            warehouse_id=warehouse.pk,
+            movement_type="ADJUSTMENT",
+            on_hand_delta=Decimal("3"),
+            user=user,
+            reason="Inventory correction",
+        )
+
+    assert_ledger_consistent()
