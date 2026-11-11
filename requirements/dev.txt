@@ -5,3 +5,4 @@ pytest-cov
 factory-boy
 ruff
 pre-commit
+pytest-repeat

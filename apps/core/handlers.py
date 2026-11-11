@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models import ProtectedError
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
@@ -6,10 +8,13 @@ from rest_framework.views import exception_handler
 
 from apps.core.exceptions import BusinessRuleError
 
+logger = logging.getLogger(__name__)
+
 
 def api_exception_handler(exc, context):
     # Case 1: Database foreign key protection
     if isinstance(exc, ProtectedError):
+        logger.warning("Resource deletion blocked by a protected relation.")
         return Response(
             {
                 "error": {
@@ -23,6 +28,10 @@ def api_exception_handler(exc, context):
 
     # Case 2: Custom business rule violations
     if isinstance(exc, BusinessRuleError):
+        logger.warning(
+            "Business rule violation: %s",
+            exc.code,
+        )
         return Response(
             {
                 "error": {
@@ -39,6 +48,10 @@ def api_exception_handler(exc, context):
 
     # Case 4: Unhandled server errors (500)
     if response is None:
+        logger.error(
+            "Unhandled API exception",
+            exc_info=(type(exc), exc, exc.__traceback__),
+        )
         return None
 
     # Case 5: Format standard DRF error responses
