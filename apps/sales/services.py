@@ -14,7 +14,11 @@ from .models import SalesOrder
 
 def _get_locked_order(order_id):
     try:
-        return SalesOrder.objects.select_for_update().select_related("customer", "warehouse").get(pk=order_id)
+        return (
+            SalesOrder.objects.select_for_update()
+            .select_related("customer", "warehouse")
+            .get(pk=order_id)
+        )
     except SalesOrder.DoesNotExist:
         raise SalesOrder.DoesNotExist
 

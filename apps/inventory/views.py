@@ -16,7 +16,12 @@ from apps.accounts.models import User
 from apps.accounts.permissions import HasAnyRole, IsAuthenticatedAndActive
 
 from .models import StockLevel, StockMovement, Warehouse
-from .serializers import StockAdjustmentInputSerializer, StockLevelSerializer, StockMovementSerializer, WarehouseSerializer
+from .serializers import (
+    StockAdjustmentInputSerializer,
+    StockLevelSerializer,
+    StockMovementSerializer,
+    WarehouseSerializer,
+)
 from .services import adjust_stock
 
 
@@ -128,7 +133,6 @@ class StockLevelViewSet(ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticatedAndActive]
 
     def get_queryset(self):
-
         qs = StockLevel.objects.select_related(
             "product",
             "warehouse",
@@ -173,7 +177,9 @@ class StockLevelViewSet(ReadOnlyModelViewSet):
                     raise ValueError
 
             except (InvalidOperation, ValueError):
-                raise ValidationError({"threshold": "Enter a valid non-negative decimal."})
+                raise ValidationError(
+                    {"threshold": "Enter a valid non-negative decimal."}
+                )
 
             qs = qs.filter(available_qty__lte=threshold)
 
@@ -223,7 +229,6 @@ class StockMovementViewSet(ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticatedAndActive]
 
     def get_queryset(self):
-
         qs = StockMovement.objects.select_related(
             "product",
             "warehouse",
@@ -310,7 +315,6 @@ class StockAdjustmentView(APIView):
         },
     )
     def post(self, request):
-
         # STEP 1: Validate input
         input_serializer = StockAdjustmentInputSerializer(data=request.data)
 

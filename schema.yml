@@ -462,6 +462,192 @@ paths:
               schema:
                 $ref: '#/components/schemas/Product'
           description: ''
+  /api/v1/dashboard/audit-logs/:
+    get:
+      operationId: audit_logs_list
+      description: "\n        Retrieve a paginated list of audit logs.\n\n        Administrators
+        can filter logs using:\n        - action: Filter by action name.\n        -
+        object_type: Filter by model type.\n        - object_id: Filter by object
+        identifier.\n        - actor: Filter by user identifier.\n\n        Results
+        are ordered by creation date, newest first.\n\n        **Permissions:** Authenticated
+        users with the ADMIN role.\n        "
+      summary: List audit logs
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+        description: Filter by action name.
+        examples:
+          ProductCreation:
+            value: product.created
+            summary: Product creation
+      - in: query
+        name: actor
+        schema:
+          type: integer
+        description: Filter by user ID.
+        examples:
+          ActorID:
+            value: 1
+            summary: Actor ID
+      - in: query
+        name: object_id
+        schema:
+          type: integer
+        description: Filter by object ID.
+        examples:
+          ObjectID:
+            value: 15
+            summary: Object ID
+      - in: query
+        name: object_type
+        schema:
+          type: string
+        description: Filter by Django model label.
+        examples:
+          ProductModel:
+            value: catalog.Product
+            summary: Product model
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - Audit Logs
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditLogList'
+              examples:
+                AuditLogsExample:
+                  value:
+                    count: 123
+                    next: http://api.example.org/accounts/?page=4
+                    previous: http://api.example.org/accounts/?page=2
+                    results:
+                    - count: 1
+                      next: null
+                      previous: null
+                      results:
+                      - id: 1
+                        actor: 1
+                        actor_email: admin@example.com
+                        action: product.created
+                        object_type: catalog.Product
+                        object_id: 15
+                        payload:
+                          sku: PROD-001
+                          name: Laptop
+                        created_at: '2026-11-16T12:00:00Z'
+                  summary: Audit logs example
+          description: Audit logs retrieved successfully.
+        '401':
+          description: Authentication credentials were not provided.
+        '403':
+          description: User does not have the ADMIN role.
+  /api/v1/dashboard/audit-logs/{id}/:
+    get:
+      operationId: audit_logs_retrieve
+      description: "\n        Retrieve the details of a specific audit log using its
+        ID.\n\n        Audit logs are read-only and cannot be modified or deleted.\n
+        \       "
+      summary: Retrieve an audit log
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this audit log.
+        required: true
+      tags:
+      - Audit Logs
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditLog'
+          description: ''
+        '401':
+          description: Authentication credentials were not provided.
+        '403':
+          description: User does not have the ADMIN role.
+        '404':
+          description: Audit log not found.
+  /api/v1/dashboard/summary/:
+    get:
+      operationId: dashboard_summary
+      description: "\n        Retrieve global statistics about the ERP system.\n\n
+        \       The response includes:\n        - Total and active products.\n        -
+        Total categories, customers and suppliers.\n        - Active warehouses.\n
+        \       - Products out of stock.\n        - Products with low available stock.\n
+        \       - Total stock value at list price.\n        - Sales orders grouped
+        by status.\n        - Purchase orders grouped by status.\n\n        **Permissions:**
+        Authenticated and active users.\n        "
+      summary: Get dashboard summary
+      tags:
+      - Dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardSummary'
+              examples:
+                DashboardSummaryExample:
+                  value:
+                    products_count: 50
+                    active_products_count: 45
+                    categories_count: 8
+                    customers_count: 20
+                    suppliers_count: 12
+                    warehouses_count: 4
+                    products_out_of_stock: 3
+                    products_low_stock: 5
+                    stock_value_at_list_price: '12500'
+                    sales_orders_by_status:
+                      DRAFT: 3
+                      CONFIRMED: 5
+                      SHIPPED: 12
+                    purchase_orders_by_status:
+                      DRAFT: 2
+                      ORDERED: 4
+                      RECEIVED: 6
+                  summary: Dashboard summary example
+          description: Dashboard statistics retrieved successfully.
+        '401':
+          description: Authentication credentials were not provided.
+        '403':
+          description: User is inactive or does not have permission.
   /api/v1/inventory/stock-adjustments/:
     post:
       operationId: v1_inventory_stock_adjustments_create
@@ -2098,6 +2284,45 @@ paths:
           description: ''
 components:
   schemas:
+    AuditLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        actor:
+          type: integer
+          readOnly: true
+          nullable: true
+        actor_email:
+          type: string
+          format: email
+          readOnly: true
+          nullable: true
+        action:
+          type: string
+          readOnly: true
+        object_type:
+          type: string
+          readOnly: true
+        object_id:
+          type: integer
+          readOnly: true
+        payload:
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - actor
+      - actor_email
+      - created_at
+      - id
+      - object_id
+      - object_type
+      - payload
     Category:
       type: object
       properties:
@@ -2158,6 +2383,47 @@ components:
       - id
       - name
       - updated_at
+    DashboardSummary:
+      type: object
+      properties:
+        products_count:
+          type: integer
+        active_products_count:
+          type: integer
+        categories_count:
+          type: integer
+        customers_count:
+          type: integer
+        suppliers_count:
+          type: integer
+        warehouses_count:
+          type: integer
+        products_out_of_stock:
+          type: integer
+        products_low_stock:
+          type: integer
+        stock_value_at_list_price:
+          type: string
+        sales_orders_by_status:
+          type: object
+          additionalProperties:
+            type: integer
+        purchase_orders_by_status:
+          type: object
+          additionalProperties:
+            type: integer
+      required:
+      - active_products_count
+      - categories_count
+      - customers_count
+      - products_count
+      - products_low_stock
+      - products_out_of_stock
+      - purchase_orders_by_status
+      - sales_orders_by_status
+      - stock_value_at_list_price
+      - suppliers_count
+      - warehouses_count
     Me:
       type: object
       description: Informations non sensibles de l'utilisateur connecté.
@@ -2212,6 +2478,29 @@ components:
         * `RESERVE` - Réservation
         * `RELEASE` - Libération
         * `ADJUSTMENT` - Ajustement
+    PaginatedAuditLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLog'
     PaginatedCategoryList:
       type: object
       required:

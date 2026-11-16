@@ -93,7 +93,14 @@ class UserSerializer(serializers.ModelSerializer):
             ).count()
 
             if active_admin_count <= 1:
-                raise serializers.ValidationError({"role": ("The last active administrator cannot remove their own admin access.")})
+                raise serializers.ValidationError(
+                    {
+                        "role": (
+                            "The last active administrator cannot remove "
+                            "their own admin access."
+                        )
+                    }
+                )
 
         return attrs
 

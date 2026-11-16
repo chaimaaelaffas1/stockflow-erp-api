@@ -30,7 +30,9 @@ class CategorySerializer(serializers.ModelSerializer):
             queryset = queryset.exclude(pk=self.instance.pk)
 
         if queryset.exists():
-            raise serializers.ValidationError("A category with this name already exists.")
+            raise serializers.ValidationError(
+                "A category with this name already exists."
+            )
 
         return value
 
@@ -90,12 +92,16 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def validate_unit_price(self, value):
         if value < 0:
-            raise serializers.ValidationError("Unit price must be greater than or equal to zero.")
+            raise serializers.ValidationError(
+                "Unit price must be greater than or equal to zero."
+            )
 
         return value
 
     def validate_reorder_level(self, value):
         if value < 0:
-            raise serializers.ValidationError("Reorder level must be greater than or equal to zero.")
+            raise serializers.ValidationError(
+                "Reorder level must be greater than or equal to zero."
+            )
 
         return value

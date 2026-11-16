@@ -42,10 +42,14 @@ User = get_user_model()
     list=extend_schema(
         tags=["Purchasing"],
         summary="List purchase orders",
-        description=("Retrieve all purchase orders. Available to authenticated and active users."),
+        description=(
+            "Retrieve all purchase orders. Available to authenticated and active users."
+        ),
         responses={
             200: PurchaseOrderReadSerializer(many=True),
-            401: OpenApiResponse(description="Authentication credentials were not provided."),
+            401: OpenApiResponse(
+                description="Authentication credentials were not provided."
+            ),
         },
     ),
     retrieve=extend_schema(
@@ -101,7 +105,10 @@ lines, but it cannot be placed until it contains at least one line.
     update=extend_schema(
         tags=["Purchasing"],
         summary="Replace a draft purchase order",
-        description=("Replace the editable fields of a purchase order. Only DRAFT orders can be updated."),
+        description=(
+            "Replace the editable fields of a purchase order. "
+            "Only DRAFT orders can be updated."
+        ),
         request=PurchaseOrderWriteSerializer,
         responses={
             200: PurchaseOrderReadSerializer,
@@ -140,7 +147,6 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
     queryset = PurchaseOrder.objects.all()
 
     def get_queryset(self):
-
         return (
             PurchaseOrder.objects.select_related(
                 "supplier",
@@ -157,7 +163,6 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         )
 
     def get_permissions(self):
-
         if self.action in ("list", "retrieve"):
             permission_classes = [
                 IsAuthenticatedAndActive,
@@ -182,16 +187,16 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
-
         if self.action in ("create", "update", "partial_update"):
             return PurchaseOrderWriteSerializer
 
         return PurchaseOrderReadSerializer
 
     def _ensure_draft(self, instance):
-
         if instance.status != PurchaseOrder.Status.DRAFT:
-            raise InvalidTransition("Only draft purchase orders can be modified or deleted.")
+            raise InvalidTransition(
+                "Only draft purchase orders can be modified or deleted."
+            )
 
     def perform_create(self, serializer):
         with transaction.atomic():
@@ -207,21 +212,18 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
             )
 
     def update(self, request, *args, **kwargs):
-
         instance = self.get_object()
         self._ensure_draft(instance)
 
         return super().update(request, *args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
-
         instance = self.get_object()
         self._ensure_draft(instance)
 
         return super().partial_update(request, *args, **kwargs)
 
     def destroy(self, request, *args, **kwargs):
-
         instance = self.get_object()
         self._ensure_draft(instance)
 
@@ -246,7 +248,9 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
             200: PurchaseOrderReadSerializer,
             403: OpenApiResponse(description="Insufficient permissions."),
             404: OpenApiResponse(description="Purchase order not found."),
-            409: OpenApiResponse(description="Invalid transition or empty purchase order."),
+            409: OpenApiResponse(
+                description="Invalid transition or empty purchase order."
+            ),
         },
         examples=[
             OpenApiExample(
@@ -273,7 +277,6 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         url_path="place",
     )
     def place(self, request, pk=None):
-
         order = place_purchase_order(
             purchase_order_id=pk,
             user=request.user,
@@ -310,7 +313,6 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         url_path="cancel",
     )
     def cancel(self, request, pk=None):
-
         order = cancel_purchase_order(
             purchase_order_id=pk,
             user=request.user,
@@ -352,7 +354,11 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
             400: OpenApiResponse(description="Invalid request data."),
             403: OpenApiResponse(description="Insufficient permissions."),
             404: OpenApiResponse(description="Purchase order not found."),
-            409: OpenApiResponse(description=("Invalid transition, over-receipt, or idempotency key conflict.")),
+            409: OpenApiResponse(
+                description=(
+                    "Invalid transition, over-receipt, or idempotency key conflict."
+                )
+            ),
         },
         examples=[
             OpenApiExample(
@@ -397,7 +403,6 @@ class PurchaseOrderViewSet(viewsets.ModelViewSet):
         url_path="receive",
     )
     def receive(self, request, pk=None):
-
         serializer = ReceiveInputSerializer(data=request.data)
 
         serializer.is_valid(raise_exception=True)

@@ -62,7 +62,10 @@ class StockLevel(TimestampedModel):
         return self.on_hand - self.reserved
 
     def __str__(self):
-        return f"{self.product} @ {self.warehouse} : {self.on_hand} (Dispo: {self.available})"
+        return (
+            f"{self.product} @ {self.warehouse} : "
+            f"{self.on_hand} (Dispo: {self.available})"
+        )
 
 
 class ImmutableQuerySet(models.QuerySet):
@@ -86,14 +89,22 @@ class StockMovement(models.Model):
         RELEASE = "RELEASE", "Libération"
         ADJUSTMENT = "ADJUSTMENT", "Ajustement"
 
-    product = models.ForeignKey("catalog.Product", on_delete=models.PROTECT, related_name="stock_movements")
-    warehouse = models.ForeignKey(Warehouse, on_delete=models.PROTECT, related_name="stock_movements")
+    product = models.ForeignKey(
+        "catalog.Product", on_delete=models.PROTECT, related_name="stock_movements"
+    )
+    warehouse = models.ForeignKey(
+        Warehouse, on_delete=models.PROTECT, related_name="stock_movements"
+    )
     movement_type = models.CharField(max_length=20, choices=MovementType.choices)
     on_hand_delta = models.DecimalField(max_digits=12, decimal_places=3)
     reserved_delta = models.DecimalField(max_digits=12, decimal_places=3)
     reference = models.CharField(max_length=100, blank=True, default="")
     reason = models.TextField(blank=True, default="")
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="stock_movements")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="stock_movements",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = ImmutableManager()
@@ -115,4 +126,8 @@ class StockMovement(models.Model):
         raise PermissionDenied("StockMovement is immutable and cannot be deleted.")
 
     def __str__(self):
-        return f"{self.created_at:%Y-%m-%d %H:%M} | {self.movement_type} | {self.product.sku} ({self.warehouse.code})"
+        return (
+            f"{self.created_at:%Y-%m-%d %H:%M} | "
+            f"{self.movement_type} | {self.product.sku} "
+            f"({self.warehouse.code})"
+        )

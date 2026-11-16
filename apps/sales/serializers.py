@@ -107,7 +107,9 @@ class SalesOrderSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"customer": "The customer is inactive."})
 
         if warehouse and not warehouse.is_active:
-            raise serializers.ValidationError({"warehouse": "The warehouse is inactive."})
+            raise serializers.ValidationError(
+                {"warehouse": "The warehouse is inactive."}
+            )
 
         lines = attrs.get("lines")
 
@@ -115,11 +117,15 @@ class SalesOrderSerializer(serializers.ModelSerializer):
             product_ids = [line["product"].pk for line in lines]
 
             if len(product_ids) != len(set(product_ids)):
-                raise serializers.ValidationError({"lines": "A product can appear only once in an order."})
+                raise serializers.ValidationError(
+                    {"lines": "A product can appear only once in an order."}
+                )
 
             for line in lines:
                 if not line["product"].is_active:
-                    raise serializers.ValidationError({"lines": "Inactive products cannot be ordered."})
+                    raise serializers.ValidationError(
+                        {"lines": "Inactive products cannot be ordered."}
+                    )
 
         return attrs
 

@@ -169,7 +169,9 @@ class SalesOrderViewSet(ModelViewSet):
     @extend_schema(
         tags=["Sales Orders"],
         summary="Confirm a sales order",
-        description=("Confirms a DRAFT order, reserves stock and freezes product prices."),
+        description=(
+            "Confirms a DRAFT order, reserves stock and freezes product prices."
+        ),
         responses={200: SalesOrderSerializer},
     )
     @action(
@@ -190,7 +192,10 @@ class SalesOrderViewSet(ModelViewSet):
     @extend_schema(
         tags=["Sales Orders"],
         summary="Ship a sales order",
-        description=("Ships a CONFIRMED order, decreases physical stock and releases reserved quantities."),
+        description=(
+            "Ships a CONFIRMED order, "
+            "decreases physical stock and releases reserved quantities."
+        ),
         responses={200: SalesOrderSerializer},
     )
     @action(
@@ -211,7 +216,10 @@ class SalesOrderViewSet(ModelViewSet):
     @extend_schema(
         tags=["Sales Orders"],
         summary="Cancel a sales order",
-        description=("Cancels a DRAFT or CONFIRMED order. A CONFIRMED order releases its reserved stock."),
+        description=(
+            "Cancels a DRAFT or CONFIRMED order. "
+            "A CONFIRMED order releases its reserved stock."
+        ),
         responses={200: SalesOrderSerializer},
     )
     @action(

@@ -28,7 +28,9 @@ class PurchaseOrderLineWriteSerializer(serializers.ModelSerializer):
 
     def validate_quantity_ordered(self, value):
         if value <= Decimal("0"):
-            raise serializers.ValidationError("Quantity ordered must be greater than zero.")
+            raise serializers.ValidationError(
+                "Quantity ordered must be greater than zero."
+            )
         return value
 
     def validate_unit_cost(self, value):
@@ -124,7 +126,6 @@ class PurchaseOrderWriteSerializer(serializers.ModelSerializer):
         read_only_fields = ["id"]
 
     def validate(self, attrs):
-
         supplier = attrs.get(
             "supplier",
             getattr(self.instance, "supplier", None),
@@ -139,19 +140,22 @@ class PurchaseOrderWriteSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"supplier": "Supplier must be active."})
 
         if warehouse and not warehouse.is_active:
-            raise serializers.ValidationError({"warehouse": "Warehouse must be active."})
+            raise serializers.ValidationError(
+                {"warehouse": "Warehouse must be active."}
+            )
 
         if "lines" in attrs:
             products = [item["product"].pk for item in attrs["lines"]]
 
             if len(products) != len(set(products)):
-                raise serializers.ValidationError({"lines": "A product can only appear once in a purchase order."})
+                raise serializers.ValidationError(
+                    {"lines": "A product can only appear once in a purchase order."}
+                )
 
         return attrs
 
     @transaction.atomic
     def create(self, validated_data):
-
         lines_data = validated_data.pop("lines", [])
 
         order = PurchaseOrder.objects.create(**validated_data)
@@ -166,7 +170,6 @@ class PurchaseOrderWriteSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def update(self, instance, validated_data):
-
         lines_data = validated_data.pop("lines", None)
 
         for attr, value in validated_data.items():
@@ -176,10 +179,14 @@ class PurchaseOrderWriteSerializer(serializers.ModelSerializer):
 
         if lines_data is not None:
             if instance.status != PurchaseOrder.Status.DRAFT:
-                raise serializers.ValidationError("Only draft purchase orders can be edited.")
+                raise serializers.ValidationError(
+                    "Only draft purchase orders can be edited."
+                )
 
             if instance.lines.filter(quantity_received__gt=0).exists():
-                raise serializers.ValidationError("Cannot replace lines after receiving goods.")
+                raise serializers.ValidationError(
+                    "Cannot replace lines after receiving goods."
+                )
 
             instance.lines.all().delete()
 

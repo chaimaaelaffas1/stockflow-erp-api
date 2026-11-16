@@ -59,7 +59,9 @@ class StockMovementSerializer(serializers.ModelSerializer):
 
 
 class StockAdjustmentInputSerializer(serializers.Serializer):
-    product = serializers.PrimaryKeyRelatedField(queryset=StockLevel._meta.get_field("product").remote_field.model.objects.all())
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=StockLevel._meta.get_field("product").remote_field.model.objects.all()
+    )
 
     warehouse = serializers.PrimaryKeyRelatedField(queryset=Warehouse.objects.all())
 
