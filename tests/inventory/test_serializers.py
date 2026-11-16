@@ -12,7 +12,6 @@ def test_adjustment_serializer_valid_data(
     product,
     warehouse,
 ):
-
     serializer = StockAdjustmentInputSerializer(
         data={
             "product": product.id,
@@ -33,7 +32,6 @@ def test_adjustment_serializer_rejects_zero(
     product,
     warehouse,
 ):
-
     serializer = StockAdjustmentInputSerializer(
         data={
             "product": product.id,
@@ -53,7 +51,6 @@ def test_adjustment_serializer_rejects_blank_reason(
     product,
     warehouse,
 ):
-
     serializer = StockAdjustmentInputSerializer(
         data={
             "product": product.id,

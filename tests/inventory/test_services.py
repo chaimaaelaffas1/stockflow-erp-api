@@ -21,7 +21,6 @@ from tests.helpers import assert_ledger_consistent
 
 @pytest.mark.django_db
 def test_adjust_stock_positive(product, warehouse, user):
-
     movement = adjust_stock(
         product_id=product.id,
         warehouse_id=warehouse.id,
@@ -49,7 +48,6 @@ def test_adjust_stock_positive(product, warehouse, user):
 
 @pytest.mark.django_db
 def test_adjust_stock_negative(product, warehouse, user):
-
     adjust_stock(
         product_id=product.id,
         warehouse_id=warehouse.id,
@@ -86,7 +84,6 @@ def test_adjust_stock_insufficient(
     warehouse,
     user,
 ):
-
     adjust_stock(
         product_id=product.id,
         warehouse_id=warehouse.id,
@@ -120,7 +117,6 @@ def test_adjustment_cannot_go_below_reserved(
     warehouse,
     user,
 ):
-
     with transaction.atomic():
         apply_stock_change(
             product_id=product.id,
@@ -163,7 +159,6 @@ def test_adjustment_requires_reason(
     warehouse,
     user,
 ):
-
     with pytest.raises(BusinessRuleError):
         adjust_stock(
             product_id=product.id,
@@ -182,7 +177,6 @@ def test_adjustment_zero_not_allowed(
     warehouse,
     user,
 ):
-
     with pytest.raises(BusinessRuleError):
         adjust_stock(
             product_id=product.id,
@@ -201,7 +195,6 @@ def test_stock_accounting_invariant(
     warehouse,
     user,
 ):
-
     with transaction.atomic():
         apply_stock_change(
             product_id=product.id,
@@ -268,7 +261,6 @@ def test_apply_stock_change_requires_transaction(
     warehouse,
     user,
 ):
-
     with pytest.raises(RuntimeError):
         apply_stock_change(
             product_id=product.id,
