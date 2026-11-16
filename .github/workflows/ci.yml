@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: stockflow_test
+          POSTGRES_USER: stockflow
+          POSTGRES_PASSWORD: stockflow
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U stockflow"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://stockflow:stockflow@localhost:5432/stockflow_test
+      SECRET_KEY: ci-only-not-a-secret
+      DJANGO_SETTINGS_MODULE: config.settings.test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements/dev.txt
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Ruff format
+        run: ruff format --check .
+
+      - name: Check migrations
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: Run tests
+        run: pytest -q
+
+      - name: Validate OpenAPI
+        run: python manage.py spectacular --file /tmp/schema.yml --validate
