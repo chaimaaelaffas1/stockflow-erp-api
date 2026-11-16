@@ -1,0 +1,828 @@
+
+
+===== 0. Environment =====
+$ docker --version
+Docker version 27.4.0, build bde2b89
+[exit code: 0]
+$ docker compose version
+Docker Compose version v2.31.0-desktop.2
+[exit code: 0]
+$ git log --oneline -5
+76d4279 Prepare production deployment (WhiteNoise, HTTPS settings, Docker prod CMD)
+6cef03b ci: add GitHub Actions test workflow
+164b214 Merge pull request #9 from chaimaaelaffas1/test/quality-and-coverage
+08571e4 feat: add read-only audit log endpoint
+965e075 feat: add dashboard summary endpoint
+[exit code: 0]
+$ docker compose build api
+ Service api  Building
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [api internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.31kB 0.0s done
+#1 DONE 0.0s
+
+#2 [api internal] load metadata for docker.io/library/python:3.12-slim
+#2 DONE 0.0s
+
+#3 [api internal] load .dockerignore
+#3 transferring context: 195B done
+#3 DONE 0.0s
+
+#4 [api internal] load build context
+#4 transferring context: 31.28kB 0.1s done
+#4 DONE 0.1s
+
+#5 [api base 1/2] FROM docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#5 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#5 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b 1.7s done
+#5 DONE 1.7s
+
+#6 [api base 2/2] WORKDIR /app
+#6 CACHED
+
+#7 [api dev 1/3] COPY requirements/ requirements/
+#7 CACHED
+
+#8 [api dev 2/3] RUN pip install --no-cache-dir -r requirements/dev.txt
+#8 2.738 Collecting Django<5.3,>=5.2 (from -r /app/requirements/base.txt (line 1))
+#8 3.023   Downloading django-5.2.19-py3-none-any.whl.metadata (4.1 kB)
+#8 3.134 Collecting djangorestframework (from -r /app/requirements/base.txt (line 2))
+#8 3.215   Downloading djangorestframework-3.18.3-py3-none-any.whl.metadata (7.8 kB)
+#8 3.322 Collecting djangorestframework-simplejwt (from -r /app/requirements/base.txt (line 3))
+#8 3.394   Downloading djangorestframework_simplejwt-5.5.1-py3-none-any.whl.metadata (4.6 kB)
+#8 3.494 Collecting django-filter (from -r /app/requirements/base.txt (line 4))
+#8 3.564   Downloading django_filter-26.2-py3-none-any.whl.metadata (5.2 kB)
+#8 3.669 Collecting drf-spectacular (from -r /app/requirements/base.txt (line 5))
+#8 3.867   Downloading drf_spectacular-0.30.0-py3-none-any.whl.metadata (14 kB)
+#8 3.978 Collecting django-environ (from -r /app/requirements/base.txt (line 7))
+#8 4.050   Downloading django_environ-0.14.0-py3-none-any.whl.metadata (12 kB)
+#8 4.149 Collecting django-cors-headers (from -r /app/requirements/base.txt (line 8))
+#8 4.391   Downloading django_cors_headers-4.9.0-py3-none-any.whl.metadata (16 kB)
+#8 4.677 Collecting pytest (from -r requirements/dev.txt (line 2))
+#8 4.745   Downloading pytest-9.2.0-py3-none-any.whl.metadata (7.9 kB)
+#8 4.857 Collecting pytest-django (from -r requirements/dev.txt (line 3))
+#8 4.933   Downloading pytest_django-4.14.0-py3-none-any.whl.metadata (8.1 kB)
+#8 5.027 Collecting pytest-cov (from -r requirements/dev.txt (line 4))
+#8 5.122   Downloading pytest_cov-7.1.0-py3-none-any.whl.metadata (32 kB)
+#8 5.273 Collecting factory-boy (from -r requirements/dev.txt (line 5))
+#8 5.361   Downloading factory_boy-3.3.3-py2.py3-none-any.whl.metadata (15 kB)
+#8 13.02 Collecting ruff (from -r requirements/dev.txt (line 6))
+#8 13.13   Downloading ruff-0.17.5-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (20 kB)
+#8 13.44 Collecting pre-commit (from -r requirements/dev.txt (line 7))
+#8 13.53   Downloading pre_commit-4.7.0-py2.py3-none-any.whl.metadata (1.2 kB)
+#8 13.61 Collecting pytest-repeat (from -r requirements/dev.txt (line 8))
+#8 13.66   Downloading pytest_repeat-0.9.4-py3-none-any.whl.metadata (4.9 kB)
+#8 13.77 Collecting psycopg[binary] (from -r /app/requirements/base.txt (line 9))
+#8 13.86   Downloading psycopg-3.3.9-py3-none-any.whl.metadata (4.4 kB)
+#8 14.05 Collecting asgiref>=3.8.1 (from Django<5.3,>=5.2->-r /app/requirements/base.txt (line 1))
+#8 14.13   Downloading asgiref-3.13.0-py3-none-any.whl.metadata (12 kB)
+#8 14.23 Collecting sqlparse>=0.3.1 (from Django<5.3,>=5.2->-r /app/requirements/base.txt (line 1))
+#8 14.31   Downloading sqlparse-0.6.1-py3-none-any.whl.metadata (6.9 kB)
+#8 14.46 Collecting pyjwt>=1.7.1 (from djangorestframework-simplejwt->-r /app/requirements/base.txt (line 3))
+#8 14.54   Downloading pyjwt-2.15.1-py3-none-any.whl.metadata (3.5 kB)
+#8 14.65 Collecting uritemplate>=2.0.0 (from drf-spectacular->-r /app/requirements/base.txt (line 5))
+#8 14.70   Downloading uritemplate-4.2.0-py3-none-any.whl.metadata (2.6 kB)
+#8 14.86 Collecting PyYAML>=5.1 (from drf-spectacular->-r /app/requirements/base.txt (line 5))
+#8 14.95   Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (2.4 kB)
+#8 15.08 Collecting jsonschema>=2.6.0 (from drf-spectacular->-r /app/requirements/base.txt (line 5))
+#8 15.15   Downloading jsonschema-4.26.0-py3-none-any.whl.metadata (7.6 kB)
+#8 15.23 Collecting inflection>=0.3.1 (from drf-spectacular->-r /app/requirements/base.txt (line 5))
+#8 15.31   Downloading inflection-0.5.1-py2.py3-none-any.whl.metadata (1.7 kB)
+#8 15.41 Collecting drf-spectacular-sidecar (from drf-spectacular[sidecar]->-r /app/requirements/base.txt (line 6))
+#8 15.49   Downloading drf_spectacular_sidecar-2026.10.1-py3-none-any.whl.metadata (3.6 kB)
+#8 15.60 Collecting typing-extensions>=4.6 (from psycopg[binary]->-r /app/requirements/base.txt (line 9))
+#8 15.67   Downloading typing_extensions-4.16.0-py3-none-any.whl.metadata (3.3 kB)
+#8 18.94 Collecting psycopg-binary==3.3.9 (from psycopg[binary]->-r /app/requirements/base.txt (line 9))
+#8 19.03   Downloading psycopg_binary-3.3.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (2.7 kB)
+#8 19.10 Collecting iniconfig>=2 (from pytest->-r requirements/dev.txt (line 2))
+#8 19.17   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+#8 19.28 Collecting packaging>=24 (from pytest->-r requirements/dev.txt (line 2))
+#8 19.35   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+#8 19.45 Collecting pluggy<2,>=1.6 (from pytest->-r requirements/dev.txt (line 2))
+#8 19.50   Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+#8 19.60 Collecting pygments>=2.15 (from pytest->-r requirements/dev.txt (line 2))
+#8 19.68   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+#8 27.43 Collecting coverage>=7.10.6 (from coverage[toml]>=7.10.6->pytest-cov->-r requirements/dev.txt (line 4))
+#8 27.52   Downloading coverage-7.17.3-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl.metadata (8.3 kB)
+#8 28.11 Collecting Faker>=0.7.0 (from factory-boy->-r requirements/dev.txt (line 5))
+#8 28.19   Downloading faker-40.54.0-py3-none-any.whl.metadata (16 kB)
+#8 28.28 Collecting cfgv>=2.0.0 (from pre-commit->-r requirements/dev.txt (line 7))
+#8 28.34   Downloading cfgv-3.5.0-py2.py3-none-any.whl.metadata (8.9 kB)
+#8 28.50 Collecting identify>=1.0.0 (from pre-commit->-r requirements/dev.txt (line 7))
+#8 28.59   Downloading identify-2.6.20-py2.py3-none-any.whl.metadata (4.4 kB)
+#8 28.67 Collecting nodeenv>=0.11.1 (from pre-commit->-r requirements/dev.txt (line 7))
+#8 28.75   Downloading nodeenv-1.12.0-py3-none-any.whl.metadata (49 kB)
+#8 29.10 Collecting virtualenv>=20.10.0 (from pre-commit->-r requirements/dev.txt (line 7))
+#8 29.18   Downloading virtualenv-21.15.6-py3-none-any.whl.metadata (4.1 kB)
+#8 29.32 Collecting attrs>=22.2.0 (from jsonschema>=2.6.0->drf-spectacular->-r /app/requirements/base.txt (line 5))
+#8 29.38   Downloading attrs-26.1.0-py3-none-any.whl.metadata (8.8 kB)
+#8 29.47 Collecting jsonschema-specifications>=2023.03.6 (from jsonschema>=2.6.0->drf-spectacular->-r /app/requirements/base.txt (line 5))
+#8 29.55   Downloading jsonschema_specifications-2025.9.1-py3-none-any.whl.metadata (2.9 kB)
+#8 29.69 Collecting referencing>=0.28.4 (from jsonschema>=2.6.0->drf-spectacular->-r /app/requirements/base.txt (line 5))
+#8 29.77   Downloading referencing-0.37.0-py3-none-any.whl.metadata (2.8 kB)
+#8 34.20 Collecting rpds-py>=0.25.0 (from jsonschema>=2.6.0->drf-spectacular->-r /app/requirements/base.txt (line 5))
+#8 34.27   Downloading rpds_py-2026.9.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.1 kB)
+#8 34.39 Collecting distlib<1,>=0.4.3 (from virtualenv>=20.10.0->pre-commit->-r requirements/dev.txt (line 7))
+#8 34.47   Downloading distlib-0.4.4-py2.py3-none-any.whl.metadata (5.3 kB)
+#8 34.64 Collecting filelock<5,>=3.24.2 (from virtualenv>=20.10.0->pre-commit->-r requirements/dev.txt (line 7))
+#8 34.70   Downloading filelock-4.2.10-py3-none-any.whl.metadata (2.3 kB)
+#8 34.85 Collecting platformdirs<5,>=4.4 (from virtualenv>=20.10.0->pre-commit->-r requirements/dev.txt (line 7))
+#8 34.94   Downloading platformdirs-4.14.5-py3-none-any.whl.metadata (5.7 kB)
+#8 35.01 Collecting python-discovery>=1.6.1 (from virtualenv>=20.10.0->pre-commit->-r requirements/dev.txt (line 7))
+#8 35.08   Downloading python_discovery-1.9.5-py3-none-any.whl.metadata (4.2 kB)
+#8 35.25 Downloading django-5.2.19-py3-none-any.whl (8.3 MB)
+#8 166.3    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.3/8.3 MB 80.5 kB/s eta 0:00:00
+#8 166.3 Downloading djangorestframework-3.18.3-py3-none-any.whl (903 kB)
+#8 175.0    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 904.0/904.0 kB 106.4 kB/s eta 0:00:00
+#8 175.1 Downloading djangorestframework_simplejwt-5.5.1-py3-none-any.whl (107 kB)
+#8 175.5 Downloading django_filter-26.2-py3-none-any.whl (94 kB)
+#8 175.8 Downloading drf_spectacular-0.30.0-py3-none-any.whl (111 kB)
+#8 176.3 Downloading django_environ-0.14.0-py3-none-any.whl (20 kB)
+#8 176.4 Downloading django_cors_headers-4.9.0-py3-none-any.whl (12 kB)
+#8 176.5 Downloading psycopg_binary-3.3.9-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (3.9 MB)
+#8 218.9    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 3.9/3.9 MB 105.2 kB/s eta 0:00:00
+#8 219.0 Downloading pytest-9.2.0-py3-none-any.whl (411 kB)
+#8 220.3 Downloading pytest_django-4.14.0-py3-none-any.whl (27 kB)
+#8 220.4 Downloading pytest_cov-7.1.0-py3-none-any.whl (22 kB)
+#8 220.5 Downloading factory_boy-3.3.3-py2.py3-none-any.whl (37 kB)
+#8 220.6 Downloading ruff-0.17.5-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (10.6 MB)
+#8 405.8    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.6/10.6 MB 101.7 kB/s eta 0:00:00
+#8 412.2 Downloading pre_commit-4.7.0-py2.py3-none-any.whl (226 kB)
+#8 437.0 WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ReadTimeoutError("HTTPSConnectionPool(host='files.pythonhosted.org', port=443): Read timed out. (read timeout=15)")': /packages/73/d4/8b706b81b07b43081bd68a2c0359fe895b74bf664b20aca8005d2bb3be71/pytest_repeat-0.9.4-py3-none-any.whl
+#8 447.5 WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f404379a390>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /packages/73/d4/8b706b81b07b43081bd68a2c0359fe895b74bf664b20aca8005d2bb3be71/pytest_repeat-0.9.4-py3-none-any.whl
+#8 458.5 WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f404360f1d0>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution')': /packages/73/d4/8b706b81b07b43081bd68a2c0359fe895b74bf664b20aca8005d2bb3be71/pytest_repeat-0.9.4-py3-none-any.whl
+#8 466.5 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f404555fb00>: Failed to establish a new connection: [Errno -5] No address associated with hostname')': /packages/73/d4/8b706b81b07b43081bd68a2c0359fe895b74bf664b20aca8005d2bb3be71/pytest_repeat-0.9.4-py3-none-any.whl
+#8 475.6 Downloading pytest_repeat-0.9.4-py3-none-any.whl (4.2 kB)
+#8 475.7 Downloading asgiref-3.13.0-py3-none-any.whl (27 kB)
+#8 475.9 Downloading cfgv-3.5.0-py2.py3-none-any.whl (7.4 kB)
+#8 476.0 Downloading coverage-7.17.3-cp312-cp312-manylinux1_x86_64.manylinux_2_28_x86_64.manylinux_2_5_x86_64.whl (264 kB)
+#8 476.8 Downloading faker-40.54.0-py3-none-any.whl (2.1 MB)
+#8 493.9    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.1/2.1 MB 113.8 kB/s eta 0:00:00
+#8 494.0 Downloading identify-2.6.20-py2.py3-none-any.whl (99 kB)
+#8 494.3 Downloading inflection-0.5.1-py2.py3-none-any.whl (9.5 kB)
+#8 494.4 Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+#8 494.5 Downloading jsonschema-4.26.0-py3-none-any.whl (90 kB)
+#8 494.8 Downloading nodeenv-1.12.0-py3-none-any.whl (39 kB)
+#8 495.3 Downloading packaging-26.3-py3-none-any.whl (129 kB)
+#8 495.9 Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+#8 496.0 Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+#8 506.2    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 128.3 kB/s eta 0:00:00
+#8 506.3 Downloading pyjwt-2.15.1-py3-none-any.whl (33 kB)
+#8 506.4 Downloading pyyaml-6.0.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (807 kB)
+#8 512.4    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 807.9/807.9 kB 149.7 kB/s eta 0:00:00
+#8 512.4 Downloading sqlparse-0.6.1-py3-none-any.whl (51 kB)
+#8 512.6 Downloading typing_extensions-4.16.0-py3-none-any.whl (45 kB)
+#8 512.7 Downloading uritemplate-4.2.0-py3-none-any.whl (11 kB)
+#8 512.8 Downloading virtualenv-21.15.6-py3-none-any.whl (5.7 MB)
+#8 550.6    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 5.7/5.7 MB 136.2 kB/s eta 0:00:00
+#8 550.7 Downloading drf_spectacular_sidecar-2026.10.1-py3-none-any.whl (2.7 MB)
+#8 570.8    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.7/2.7 MB 145.6 kB/s eta 0:00:00
+#8 570.9 Downloading psycopg-3.3.9-py3-none-any.whl (219 kB)
+#8 572.5 Downloading attrs-26.1.0-py3-none-any.whl (67 kB)
+#8 573.2 Downloading distlib-0.4.4-py2.py3-none-any.whl (472 kB)
+#8 589.3 ERROR: Exception:
+#8 589.3 Traceback (most recent call last):
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_vendor/urllib3/response.py", line 438, in _error_catcher
+#8 589.3     yield
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_vendor/urllib3/response.py", line 561, in read
+#8 589.3     data = self._fp_read(amt) if not fp_closed else b""
+#8 589.3            ^^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_vendor/urllib3/response.py", line 527, in _fp_read
+#8 589.3     return self._fp.read(amt) if amt is not None else self._fp.read()
+#8 589.3            ^^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/http/client.py", line 494, in read
+#8 589.3     s = self.fp.read(amt)
+#8 589.3         ^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/socket.py", line 720, in readinto
+#8 589.3     return self._sock.recv_into(b)
+#8 589.3            ^^^^^^^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/ssl.py", line 1264, in recv_into
+#8 589.3     return self.read(nbytes, buffer)
+#8 589.3            ^^^^^^^^^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/ssl.py", line 1116, in read
+#8 589.3     return self._sslobj.read(len, buffer)
+#8 589.3            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#8 589.3 TimeoutError: The read operation timed out
+#8 589.3 
+#8 589.3 During handling of the above exception, another exception occurred:
+#8 589.3 
+#8 589.3 Traceback (most recent call last):
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_internal/cli/base_command.py", line 106, in _run_wrapper
+#8 589.3     status = _inner_run()
+#8 589.3              ^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_internal/cli/base_command.py", line 97, in _inner_run
+#8 589.3     return self.run(options, args)
+#8 589.3            ^^^^^^^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_internal/cli/req_command.py", line 67, in wrapper
+#8 589.3     return func(self, options, args)
+#8 589.3            ^^^^^^^^^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_internal/commands/install.py", line 386, in run
+#8 589.3     requirement_set = resolver.resolve(
+#8 589.3                       ^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_internal/resolution/resolvelib/resolver.py", line 179, in resolve
+#8 589.3     self.factory.preparer.prepare_linked_requirements_more(reqs)
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_internal/operations/prepare.py", line 554, in prepare_linked_requirements_more
+#8 589.3     self._complete_partial_requirements(
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_internal/operations/prepare.py", line 469, in _complete_partial_requirements
+#8 589.3     for link, (filepath, _) in batch_download:
+#8 589.3                                ^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_internal/network/download.py", line 184, in __call__
+#8 589.3     for chunk in chunks:
+#8 589.3                  ^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_internal/network/utils.py", line 65, in response_chunks
+#8 589.3     for chunk in response.raw.stream(
+#8 589.3                  ^^^^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_vendor/urllib3/response.py", line 622, in stream
+#8 589.3     data = self.read(amt=amt, decode_content=decode_content)
+#8 589.3            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_vendor/urllib3/response.py", line 560, in read
+#8 589.3     with self._error_catcher():
+#8 589.3          ^^^^^^^^^^^^^^^^^^^^^
+#8 589.3   File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+#8 589.3     self.gen.throw(value)
+#8 589.3   File "/usr/local/lib/python3.12/site-packages/pip/_vendor/urllib3/response.py", line 443, in _error_catcher
+#8 589.3     raise ReadTimeoutError(self._pool, None, "Read timed out.")
+#8 589.3 pip._vendor.urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='files.pythonhosted.org', port=443): Read timed out.
+#8 ERROR: process "/bin/sh -c pip install --no-cache-dir -r requirements/dev.txt" did not complete successfully: exit code: 2
+------
+ > [api dev 2/3] RUN pip install --no-cache-dir -r requirements/dev.txt:
+589.3     data = self.read(amt=amt, decode_content=decode_content)
+589.3            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+589.3   File "/usr/local/lib/python3.12/site-packages/pip/_vendor/urllib3/response.py", line 560, in read
+589.3     with self._error_catcher():
+589.3          ^^^^^^^^^^^^^^^^^^^^^
+589.3   File "/usr/local/lib/python3.12/contextlib.py", line 158, in __exit__
+589.3     self.gen.throw(value)
+589.3   File "/usr/local/lib/python3.12/site-packages/pip/_vendor/urllib3/response.py", line 443, in _error_catcher
+589.3     raise ReadTimeoutError(self._pool, None, "Read timed out.")
+589.3 pip._vendor.urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='files.pythonhosted.org', port=443): Read timed out.
+------
+failed to solve: process "/bin/sh -c pip install --no-cache-dir -r requirements/dev.txt" did not complete successfully: exit code: 2
+[exit code: 17]
+
+
+===== 1. Versions =====
+$ dc python --version
+ Container stockflow_db  Running
+Python 3.12.16
+[exit code: 0]
+$ dc sh -c pip list 2>/dev/null | grep -Ei "^(django|djangorestframework|djangorestframework-simplejwt|django-filter|drf-spectacular|psycopg|pytest|pytest-django|pytest-cov|factory-boy|ruff|gunicorn|whitenoise) "
+ Container stockflow_db  Running
+Django                        5.2.19
+django-filter                 26.2
+djangorestframework           3.18.3
+drf-spectacular               0.30.0
+psycopg                       3.3.9
+pytest                        9.2.0
+pytest-cov                    7.1.0
+pytest-django                 4.14.0
+ruff                          0.17.5
+[exit code: 0]
+
+
+===== 2. Ruff =====
+$ dc ruff check .
+ Container stockflow_db  Running
+All checks passed!
+[exit code: 0]
+$ dc ruff format --check .
+ Container stockflow_db  Running
+123 files already formatted
+[exit code: 0]
+
+
+===== 3. Django checks and migrations =====
+$ dc python manage.py check
+ Container stockflow_db  Running
+System check identified no issues (0 silenced).
+[exit code: 0]
+$ dc python manage.py makemigrations --check --dry-run
+ Container stockflow_db  Running
+No changes detected
+[exit code: 0]
+
+
+===== 4. Tests and coverage (PostgreSQL) =====
+$ dc pytest --collect-only -q -p no:cacheprovider
+ Container stockflow_db  Running
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/auth/me/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/users/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/partners/customers/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/partners/suppliers/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/catalog/categories/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/catalog/products/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/inventory/warehouses/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/inventory/stock-levels/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/inventory/stock-movements/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/sales/sales-orders/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/purchasing/purchase-orders/]
+tests/accounts/test_anonymous_access.py::test_protected_endpoints_require_authentication[/api/v1/purchasing/receipts/]
+tests/accounts/test_auth.py::test_login_returns_access_and_refresh
+tests/accounts/test_auth.py::test_login_wrong_password_returns_401
+tests/accounts/test_auth.py::test_inactive_user_cannot_login
+tests/accounts/test_auth.py::test_me_requires_authentication
+tests/accounts/test_auth.py::test_me_returns_current_user
+tests/accounts/test_auth.py::test_expired_access_token_is_rejected
+tests/accounts/test_auth.py::test_refresh_rotation_invalidates_old_refresh
+tests/accounts/test_auth.py::test_logout_blacklists_refresh
+tests/accounts/test_auth.py::test_non_admin_cannot_list_users[VIEWER]
+tests/accounts/test_auth.py::test_non_admin_cannot_list_users[SALES]
+tests/accounts/test_auth.py::test_non_admin_cannot_list_users[STOCK_MANAGER]
+tests/accounts/test_auth.py::test_non_admin_cannot_list_users[PURCHASER]
+tests/accounts/test_auth.py::test_non_admin_cannot_create_user[VIEWER]
+tests/accounts/test_auth.py::test_non_admin_cannot_create_user[SALES]
+tests/accounts/test_auth.py::test_non_admin_cannot_create_user[STOCK_MANAGER]
+tests/accounts/test_auth.py::test_non_admin_cannot_create_user[PURCHASER]
+tests/accounts/test_auth.py::test_admin_can_list_users
+tests/accounts/test_auth.py::test_admin_can_retrieve_user
+tests/accounts/test_auth.py::test_non_admin_cannot_retrieve_user
+tests/accounts/test_auth.py::test_admin_can_update_user
+tests/accounts/test_auth.py::test_non_admin_cannot_update_user
+tests/accounts/test_auth.py::test_admin_cannot_delete_user
+tests/accounts/test_permissions_matrix.py::test_create_endpoint_permissions[/api/v1/catalog/categories/-allowed_roles0-payload0]
+tests/accounts/test_permissions_matrix.py::test_create_endpoint_permissions[/api/v1/catalog/products/-allowed_roles1-None]
+tests/accounts/test_permissions_matrix.py::test_create_endpoint_permissions[/api/v1/partners/customers/-allowed_roles2-payload2]
+tests/accounts/test_permissions_matrix.py::test_create_endpoint_permissions[/api/v1/partners/suppliers/-allowed_roles3-payload3]
+tests/accounts/test_permissions_matrix.py::test_create_endpoint_permissions[/api/v1/inventory/warehouses/-allowed_roles4-payload4]
+tests/catalog/test_categories.py::test_admin_can_create_category
+tests/catalog/test_categories.py::test_stock_manager_can_create_category
+tests/catalog/test_categories.py::test_viewer_cannot_create_category
+tests/catalog/test_categories.py::test_authenticated_user_can_list_categories
+tests/catalog/test_categories.py::test_category_name_is_trimmed
+tests/catalog/test_categories.py::test_duplicate_category_name_is_rejected
+tests/catalog/test_categories.py::test_stock_manager_cannot_delete_category
+tests/catalog/test_categories.py::test_admin_can_delete_unused_category
+tests/catalog/test_categories.py::test_admin_gets_409_when_deleting_used_category
+tests/catalog/test_filters.py::test_filter_products_by_category
+tests/catalog/test_filters.py::test_filter_products_by_active_status
+tests/catalog/test_filters.py::test_search_products_by_name
+tests/catalog/test_filters.py::test_search_products_by_sku
+tests/catalog/test_filters.py::test_order_products_by_unit_price
+tests/catalog/test_filters.py::test_order_products_by_name
+tests/catalog/test_permissions.py::test_anonymous_user_cannot_list_categories
+tests/catalog/test_permissions.py::test_anonymous_user_cannot_list_products
+tests/catalog/test_permissions.py::test_sales_can_read_products
+tests/catalog/test_permissions.py::test_purchaser_can_read_categories
+tests/catalog/test_permissions.py::test_inactive_user_cannot_read_products
+tests/catalog/test_products.py::test_admin_can_create_product
+tests/catalog/test_products.py::test_stock_manager_can_create_product
+tests/catalog/test_products.py::test_viewer_cannot_create_product
+tests/catalog/test_products.py::test_product_sku_is_normalized
+tests/catalog/test_products.py::test_duplicate_product_sku_is_rejected
+tests/catalog/test_products.py::test_negative_product_price_is_rejected
+tests/catalog/test_products.py::test_product_can_be_updated
+tests/catalog/test_products.py::test_product_can_be_deactivated
+tests/catalog/test_products.py::test_deactivate_is_idempotent
+tests/catalog/test_products.py::test_product_delete_is_not_allowed
+tests/catalog/test_queries.py::test_product_list_uses_join_for_category
+tests/core/test_audit_logs.py::test_admin_can_list_audit_logs
+tests/core/test_audit_logs.py::test_non_admin_cannot_list_audit_logs
+tests/core/test_audit_logs.py::test_audit_log_cannot_be_modified
+tests/core/test_audit_logs.py::test_audit_log_cannot_be_updated
+tests/core/test_dashboard.py::test_dashboard_summary_returns_correct_values
+tests/core/test_handlers.py::test_unexpected_exception_is_logged_and_not_exposed
+tests/core/test_health.py::test_health_check_returns_200
+tests/inventory/test_models.py::test_on_hand_cannot_be_negative
+tests/inventory/test_models.py::test_reserved_cannot_be_negative
+tests/inventory/test_models.py::test_reserved_cannot_exceed_on_hand
+tests/inventory/test_models.py::test_product_sku_is_case_insensitive
+tests/inventory/test_models.py::test_product_with_stock_cannot_be_deleted
+tests/inventory/test_models.py::test_only_one_stock_level_per_product_and_warehouse
+tests/inventory/test_models.py::test_stock_movement_cannot_be_modified
+tests/inventory/test_models.py::test_reorder_level_cannot_be_negative
+tests/inventory/test_serializers.py::test_adjustment_serializer_valid_data
+tests/inventory/test_serializers.py::test_adjustment_serializer_rejects_zero
+tests/inventory/test_serializers.py::test_adjustment_serializer_rejects_blank_reason
+tests/inventory/test_services.py::test_adjust_stock_positive
+tests/inventory/test_services.py::test_adjust_stock_negative
+tests/inventory/test_services.py::test_adjust_stock_insufficient
+tests/inventory/test_services.py::test_adjustment_cannot_go_below_reserved
+tests/inventory/test_services.py::test_adjustment_requires_reason
+tests/inventory/test_services.py::test_adjustment_zero_not_allowed
+tests/inventory/test_services.py::test_stock_accounting_invariant
+tests/inventory/test_services.py::test_ledger_consistency_after_stock_operations
+tests/inventory/test_views.py::test_stock_level_list
+tests/inventory/test_views.py::test_stock_adjustment_by_stock_manager
+tests/inventory/test_views.py::test_stock_adjustment_forbidden_for_viewer
+tests/inventory/test_views.py::test_stock_movement_is_read_only
+tests/partners/test_customers.py::test_create_customer
+tests/partners/test_customers.py::test_list_customers
+tests/partners/test_customers.py::test_retrieve_customer
+tests/partners/test_customers.py::test_update_customer
+tests/partners/test_customers.py::test_partial_update_customer
+tests/partners/test_customers.py::test_deactivate_customer
+tests/partners/test_customers.py::test_customer_name_cannot_be_empty
+tests/partners/test_customers.py::test_delete_customer
+tests/partners/test_filters.py::test_customer_search
+tests/partners/test_filters.py::test_customer_filter_by_active_status
+tests/partners/test_filters.py::test_customer_ordering
+tests/partners/test_filters.py::test_supplier_search
+tests/partners/test_filters.py::test_supplier_filter_by_active_status
+tests/partners/test_pagination.py::test_customer_pagination
+tests/partners/test_pagination.py::test_customer_second_page
+tests/partners/test_pagination.py::test_supplier_pagination
+tests/partners/test_permissions.py::test_sales_can_create_customer
+tests/partners/test_permissions.py::test_sales_cannot_create_supplier
+tests/partners/test_permissions.py::test_purchaser_can_create_supplier
+tests/partners/test_permissions.py::test_purchaser_cannot_create_customer
+tests/partners/test_permissions.py::test_viewer_cannot_create_customer
+tests/partners/test_permissions.py::test_viewer_cannot_create_supplier
+tests/partners/test_permissions.py::test_viewer_can_read_customers
+tests/partners/test_permissions.py::test_viewer_can_read_suppliers
+tests/partners/test_permissions.py::test_sales_cannot_delete_customer
+tests/partners/test_permissions.py::test_purchaser_cannot_delete_supplier
+tests/partners/test_permissions.py::test_anonymous_user_cannot_read_customers
+tests/partners/test_suppliers.py::test_create_supplier
+tests/partners/test_suppliers.py::test_list_suppliers
+tests/partners/test_suppliers.py::test_retrieve_supplier
+tests/partners/test_suppliers.py::test_update_supplier
+tests/partners/test_suppliers.py::test_partial_update_supplier
+tests/partners/test_suppliers.py::test_deactivate_supplier
+tests/partners/test_suppliers.py::test_supplier_name_cannot_be_empty
+tests/partners/test_suppliers.py::test_delete_supplier
+tests/purchasing/test_permissions.py::test_purchaser_can_create_purchase_order
+tests/purchasing/test_permissions.py::test_viewer_cannot_create_purchase_order
+tests/purchasing/test_permissions.py::test_purchaser_cannot_receive_goods
+tests/purchasing/test_services.py::test_place_purchase_order
+tests/purchasing/test_services.py::test_cancel_draft_order
+tests/purchasing/test_services.py::test_partial_receipt
+tests/purchasing/test_services.py::test_complete_receipt
+tests/purchasing/test_services.py::test_over_receipt_is_rejected
+tests/purchasing/test_services.py::test_idempotent_replay
+tests/purchasing/test_services.py::test_same_key_different_payload_is_rejected
+tests/purchasing/test_services.py::test_duplicate_lines_are_aggregated
+tests/purchasing/test_services.py::test_duplicate_lines_over_remaining_are_rejected
+tests/purchasing/test_services.py::test_cannot_receive_cancelled_order
+tests/purchasing/test_services.py::test_cannot_cancel_after_partial_receipt
+tests/purchasing/test_services.py::test_receipt_creates_stock_level
+tests/sales/test_sales_order_services.py::TestConfirmSalesOrder::test_confirm_draft_order_reserves_stock
+tests/sales/test_sales_order_services.py::TestConfirmSalesOrder::test_confirm_order_without_lines_raises_error
+tests/sales/test_sales_order_services.py::TestConfirmSalesOrder::test_confirm_order_with_insufficient_stock_rolls_back_everything
+tests/sales/test_sales_order_services.py::TestConfirmSalesOrder::test_cannot_confirm_already_confirmed_order
+tests/sales/test_sales_order_services.py::TestConfirmSalesOrder::test_price_is_frozen_at_confirmation
+tests/sales/test_sales_order_services.py::TestShipSalesOrder::test_ship_confirmed_order_decreases_stock
+tests/sales/test_sales_order_services.py::TestShipSalesOrder::test_cannot_ship_draft_order
+tests/sales/test_sales_order_services.py::TestShipSalesOrder::test_cannot_ship_already_shipped_order
+tests/sales/test_sales_order_services.py::TestCancelSalesOrder::test_cancel_draft_order_without_stock_movement
+tests/sales/test_sales_order_services.py::TestCancelSalesOrder::test_cancel_confirmed_order_releases_reserved_stock
+tests/sales/test_sales_order_services.py::TestCancelSalesOrder::test_cannot_cancel_shipped_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderCreateAPI::test_sales_user_can_create_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderCreateAPI::test_viewer_cannot_create_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderCreateAPI::test_cannot_create_order_with_inactive_customer
+tests/sales/test_sales_orders_api.py::TestSalesOrderReadAPI::test_viewer_can_list_orders
+tests/sales/test_sales_orders_api.py::TestSalesOrderReadAPI::test_viewer_can_retrieve_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderConfirmAPI::test_sales_user_can_confirm_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderConfirmAPI::test_confirmation_fails_when_stock_is_insufficient
+tests/sales/test_sales_orders_api.py::TestSalesOrderShipAPI::test_stock_manager_can_ship_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderShipAPI::test_sales_user_cannot_ship_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderCancelAPI::test_sales_user_can_cancel_draft_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderCancelAPI::test_sales_user_can_cancel_confirmed_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderCancelAPI::test_cannot_cancel_shipped_order_from_api
+tests/sales/test_sales_orders_api.py::TestSalesOrderUpdateAPI::test_sales_user_can_update_draft_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderUpdateAPI::test_cannot_update_confirmed_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderUpdateAPI::test_sales_user_can_delete_draft_order
+tests/sales/test_sales_orders_api.py::TestSalesOrderUpdateAPI::test_cannot_delete_confirmed_order
+tests/test_smoke.py::test_database_is_postgresql
+tests/inventory/test_services.py::test_apply_stock_change_requires_transaction
+tests/purchasing/test_concurrency.py::test_concurrent_receipts_never_over_receive
+tests/purchasing/test_concurrency.py::test_concurrent_receipts_same_key_create_one_receipt
+tests/sales/test_concurrency.py::test_concurrent_confirmations_never_oversell
+tests/sales/test_concurrency.py::test_concurrent_confirmation_and_cancellation
+
+183 tests collected in 0.47s
+[exit code: 0]
+$ dc pytest -q -ra --cov=apps --cov-report=term -p no:cacheprovider
+ Container stockflow_db  Running
+........................................................................ [ 39%]
+........................................................................ [ 78%]
+.......................................                                  [100%]
+================================ tests coverage ================================
+_______________ coverage: platform linux, python 3.12.16-final-0 _______________
+
+Name                                                                   Stmts   Miss  Cover
+------------------------------------------------------------------------------------------
+apps/__init__.py                                                           0      0   100%
+apps/accounts/__init__.py                                                  0      0   100%
+apps/accounts/admin.py                                                     0      0   100%
+apps/accounts/apps.py                                                      4      0   100%
+apps/accounts/migrations/0001_initial.py                                   8      0   100%
+apps/accounts/migrations/0002_alter_user_managers_alter_user_role.py       5      0   100%
+apps/accounts/migrations/__init__.py                                       0      0   100%
+apps/accounts/models.py                                                   35      8    77%
+apps/accounts/permissions.py                                              19      0   100%
+apps/accounts/serializers.py                                              49     17    65%
+apps/accounts/tests.py                                                     0      0   100%
+apps/accounts/urls.py                                                     12      0   100%
+apps/accounts/views.py                                                    34      3    91%
+apps/accounts/viewsets.py                                                 11      0   100%
+apps/catalog/__init__.py                                                   0      0   100%
+apps/catalog/admin.py                                                     14      0   100%
+apps/catalog/apps.py                                                       4      0   100%
+apps/catalog/filters.py                                                    9      0   100%
+apps/catalog/migrations/0001_initial.py                                    7      0   100%
+apps/catalog/migrations/0002_product_reorder_level_and_more.py             4      0   100%
+apps/catalog/migrations/__init__.py                                        0      0   100%
+apps/catalog/models.py                                                    22      2    91%
+apps/catalog/serializers.py                                               46      6    87%
+apps/catalog/tests.py                                                      0      0   100%
+apps/catalog/urls.py                                                       6      0   100%
+apps/catalog/views.py                                                     63      1    98%
+apps/core/__init__.py                                                      0      0   100%
+apps/core/admin.py                                                         0      0   100%
+apps/core/apps.py                                                          4      0   100%
+apps/core/audit.py                                                         3      0   100%
+apps/core/exceptions.py                                                   16      0   100%
+apps/core/handlers.py                                                     27      2    93%
+apps/core/management/__init__.py                                           0      0   100%
+apps/core/management/commands/__init__.py                                  0      0   100%
+apps/core/management/commands/seed_demo.py                                46     46     0%
+apps/core/migrations/0001_initial.py                                       7      0   100%
+apps/core/migrations/__init__.py                                           0      0   100%
+apps/core/models.py                                                       32      3    91%
+apps/core/pagination.py                                                    5      0   100%
+apps/core/serializers.py                                                  20      0   100%
+apps/core/tests.py                                                         0      0   100%
+apps/core/urls.py                                                          6      0   100%
+apps/core/views.py                                                        58      4    93%
+apps/inventory/__init__.py                                                 0      0   100%
+apps/inventory/admin.py                                                    0      0   100%
+apps/inventory/apps.py                                                     4      0   100%
+apps/inventory/migrations/0001_initial.py                                  7      0   100%
+apps/inventory/migrations/__init__.py                                      0      0   100%
+apps/inventory/models.py                                                  58      6    90%
+apps/inventory/serializers.py                                             31      1    97%
+apps/inventory/services.py                                                32      2    94%
+apps/inventory/tests.py                                                    0      0   100%
+apps/inventory/urls.py                                                     8      0   100%
+apps/inventory/views.py                                                   76     24    68%
+apps/partners/__init__.py                                                  0      0   100%
+apps/partners/admin.py                                                     0      0   100%
+apps/partners/apps.py                                                      4      0   100%
+apps/partners/migrations/0001_initial.py                                   5      0   100%
+apps/partners/migrations/__init__.py                                       0      0   100%
+apps/partners/models.py                                                   19      1    95%
+apps/partners/serializers.py                                              28      4    86%
+apps/partners/tests.py                                                     0      0   100%
+apps/partners/urls.py                                                      6      0   100%
+apps/partners/views.py                                                     0      0   100%
+apps/partners/viewsets.py                                                 38      0   100%
+apps/purchasing/__init__.py                                                0      0   100%
+apps/purchasing/admin.py                                                  21      0   100%
+apps/purchasing/apps.py                                                    4      0   100%
+apps/purchasing/migrations/0001_initial.py                                 8      0   100%
+apps/purchasing/migrations/__init__.py                                     0      0   100%
+apps/purchasing/models.py                                                 52      5    90%
+apps/purchasing/serializers.py                                            96     23    76%
+apps/purchasing/services.py                                               99     15    85%
+apps/purchasing/tests.py                                                   0      0   100%
+apps/purchasing/urls.py                                                    6      0   100%
+apps/purchasing/views.py                                                  73     23    68%
+apps/sales/__init__.py                                                     0      0   100%
+apps/sales/admin.py                                                        0      0   100%
+apps/sales/apps.py                                                         4      0   100%
+apps/sales/filters.py                                                      7      0   100%
+apps/sales/migrations/0001_initial.py                                      8      0   100%
+apps/sales/migrations/0002_alter_salesorder_number.py                      4      0   100%
+apps/sales/migrations/0003_alter_salesorderline_quantity.py                6      0   100%
+apps/sales/migrations/__init__.py                                          0      0   100%
+apps/sales/models.py                                                      46      2    96%
+apps/sales/serializers.py                                                 57      6    89%
+apps/sales/services.py                                                    63      5    92%
+apps/sales/tests.py                                                        0      0   100%
+apps/sales/urls.py                                                         5      0   100%
+apps/sales/views.py                                                       66      0   100%
+------------------------------------------------------------------------------------------
+TOTAL                                                                   1517    209    86%
+183 passed in 11.27s
+[exit code: 0]
+
+
+===== 5. OpenAPI validation and sync with schema.yml =====
+$ dc python manage.py spectacular --validate --file /tmp/s.yml
+ Container stockflow_db  Running
+Traceback (most recent call last):
+  File "/app/manage.py", line 23, in <module>
+    main()
+  File "/app/manage.py", line 19, in main
+    execute_from_command_line(sys.argv)
+  File "/usr/local/lib/python3.12/site-packages/django/core/management/__init__.py", line 442, in execute_from_command_line
+    utility.execute()
+  File "/usr/local/lib/python3.12/site-packages/django/core/management/__init__.py", line 436, in execute
+    self.fetch_command(subcommand).run_from_argv(self.argv)
+  File "/usr/local/lib/python3.12/site-packages/django/core/management/base.py", line 420, in run_from_argv
+    self.execute(*args, **cmd_options)
+  File "/usr/local/lib/python3.12/site-packages/django/core/management/base.py", line 464, in execute
+    output = self.handle(*args, **options)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/site-packages/drf_spectacular/management/commands/spectacular.py", line 131, in handle
+    with open(options['file'], 'wb') as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'C:/Users/elaff/AppData/Local/Temp/s.yml'
+[exit code: 1]
+$ dc sh -c python manage.py spectacular --file /tmp/s.yml >/dev/null 2>&1; diff -q /tmp/s.yml schema.yml && echo SCHEMA_IN_SYNC || { echo SCHEMA_DIFFERS; diff /tmp/s.yml schema.yml | head -40; }
+ Container stockflow_db  Running
+Files /tmp/s.yml and schema.yml differ
+SCHEMA_DIFFERS
+1,3649c1,3649
+< openapi: 3.0.3
+< info:
+<   title: StockFlow ERP API
+<   version: 1.0.0
+<   description: "\n    REST API for managing an ERP inventory system.\n\n    Main modules:\n
+<     \   - Authentication and user management\n    - Customers and suppliers\n    -
+<     Product categories and products\n    - Inventory management\n    - Sales and purchases\n
+<     \   "
+< paths:
+<   /api/v1/auth/logout/:
+<     post:
+<       operationId: v1_auth_logout_create
+<       description: "\n    Log out the authenticated user by blacklisting their refresh
+<         token.\n\n    Request body:\n    - refresh: The refresh token to invalidate.\n\n
+<         \   Returns HTTP 204 when the token is successfully blacklisted.\n    Returns
+<         HTTP 400 if the refresh token is missing or invalid.\n    "
+<       summary: Logout User
+<       tags:
+<       - Authentication
+<       requestBody:
+<         content:
+<           application/json:
+<             schema:
+<               type: object
+<               properties:
+<                 refresh:
+<                   type: string
+<                   description: The refresh token to blacklist.
+<               required:
+<               - refresh
+<       security:
+<       - jwtAuth: []
+<       responses:
+<         '204':
+<           description: No response body
+<         '400':
+<           description: Missing or invalid refresh token.
+<         '401':
+<           description: Authentication required.
+[exit code: 0]
+
+
+===== 6. Live API: start, migrate, seed, admin =====
+$ docker compose up -d --build api
+ Service api  Building
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [api internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.31kB done
+#1 DONE 0.0s
+
+#2 [api internal] load metadata for docker.io/library/python:3.12-slim
+#2 DONE 0.0s
+
+#3 [api internal] load .dockerignore
+#3 transferring context: 195B done
+#3 DONE 0.0s
+
+#4 [api internal] load build context
+#4 transferring context: 71.51kB 0.0s done
+#4 DONE 0.1s
+
+#5 [api base 1/2] FROM docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#5 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b 0.0s done
+#5 DONE 0.0s
+
+#6 [api base 2/2] WORKDIR /app
+#6 CACHED
+
+#7 [api dev 1/3] COPY requirements/ requirements/
+#7 CACHED
+
+#8 [api dev 2/3] RUN pip install --no-cache-dir -r requirements/dev.txt
+#8 1.606 WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f30f93ebb90>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/django/
+#8 2.111 WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f30f942ff80>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/django/
+#8 3.119 WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f30f9226090>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/django/
+#8 5.127 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f30f92263c0>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/django/
+#8 9.132 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f30f92265d0>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/django/
+#8 9.145 ERROR: Could not find a version that satisfies the requirement Django<5.3,>=5.2 (from versions: none)
+#8 9.169 ERROR: No matching distribution found for Django<5.3,>=5.2
+#8 ERROR: process "/bin/sh -c pip install --no-cache-dir -r requirements/dev.txt" did not complete successfully: exit code: 1
+------
+ > [api dev 2/3] RUN pip install --no-cache-dir -r requirements/dev.txt:
+1.606 WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f30f93ebb90>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/django/
+2.111 WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f30f942ff80>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/django/
+3.119 WARNING: Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f30f9226090>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/django/
+5.127 WARNING: Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f30f92263c0>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/django/
+9.132 WARNING: Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7f30f92265d0>: Failed to establish a new connection: [Errno -2] Name or service not known')': /simple/django/
+9.145 ERROR: Could not find a version that satisfies the requirement Django<5.3,>=5.2 (from versions: none)
+9.169 ERROR: No matching distribution found for Django<5.3,>=5.2
+------
+failed to solve: process "/bin/sh -c pip install --no-cache-dir -r requirements/dev.txt" did not complete successfully: exit code: 1
+[exit code: 17]
+$ docker compose exec -T api python manage.py migrate --noinput
+Operations to perform:
+  Apply all migrations: accounts, admin, auth, catalog, contenttypes, core, inventory, partners, purchasing, sales, sessions, token_blacklist
+Running migrations:
+  No migrations to apply.
+[exit code: 0]
+$ docker compose exec -T api python manage.py seed_demo
+Données de démonstration StockFlow créées ou déjà présentes.
+[exit code: 0]
+$ docker compose exec -T -e DJANGO_SUPERUSER_PASSWORD=Verify-Only-Pass-2026! api python manage.py createsuperuser --noinput --email verify.admin@stockflow.local
+Superuser created successfully.
+[exit code: 0]
+
+
+===== 7. Read endpoints and error formats =====
+--- (anonymous) GET /api/v1/health/ -> 200
+{"status": "ok"}
+--- (anonymous) GET /api/v1/catalog/products/ -> 401
+{"error":{"code":"not_authenticated","message":"Request failed.","details":{"detail":"Authentication credentials were not provided."}}}
+--- (anonymous) GET /api/schema/swagger-ui/ -> 200
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <title>StockFlow ERP API</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@latest/favicon-32x32.png">
+    <link rel="stylesheet" 
+--- (anonymous) GET /api/schema/redoc/ -> 200
+<!DOCTYPE html>
+<html>
+  <head>
+    
+    <title>StockFlow ERP API</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" cr
+--- GET /api/v1/auth/me/ -> 200
+{"id":3,"email":"verify.admin@stockflow.local","username":"verify.admin@stockflow.local","first_name":"","last_name":"","role":"ADMIN","is_active":true}
+--- GET /api/v1/dashboard/summary/ -> 200
+{"products_count":20,"active_products_count":20,"categories_count":4,"customers_count":3,"suppliers_count":2,"warehouses_count":2,"products_out_of_stock":0,"products_low_stock":0,"stock_value_at_list_price":"17220","sales_orders_by_status":{},"purchase_orders_by_status":{}}
+--- GET /api/v1/catalog/products/?page_size=2 -> 200
+{"count":20,"next":"http://localhost:8000/api/v1/catalog/products/?page=2&page_size=2","previous":null,"results":[{"id":16,"sku":"ELE-001","name":"Câble électrique 10 m","description":"","category":4,"category_name":"Électricité","unit_price":"75.00","is_active":true,"reorder_level":"0.000","created_at":"2026-11-16T17:31:39.306523Z","updated_at":"2026-11-16T17:31:39.306534Z"},{"id":17,"sku":"ELE-002","name":"Interrupteur","description":"","category":4,"category_name":"Électricité","unit_price":"20.00","is_active":true,"reorder_level":"0.000","created_at":"2026-11-16T17:31:39.308682Z","updated_at":"2026-11-16T17:31:39.308692Z"}]}
+--- GET /api/v1/catalog/products/?search=marteau -> 200
+{"count":1,"next":null,"previous":null,"results":[{"id":1,"sku":"OUT-001","name":"Marteau","description":"","category":1,"category_name":"Outillage","unit_price":"85.00","is_active":true,"reorder_level":"0.000","created_at":"2026-11-16T17:31:39.279957Z","updated_at":"2026-11-16T17:31:39.279968Z"}]}
+--- GET /api/v1/inventory/stock-levels/?page_size=2 -> 200
+{"count":40,"next":"http://localhost:8000/api/v1/inventory/stock-levels/?page=2&page_size=2","previous":null,"results":[{"id":1,"product":1,"warehouse":1,"on_hand":"10.000","reserved":"0.000","available":"10.000","updated_at":"2026-11-16T17:31:39.332023Z"},{"id":2,"product":1,"warehouse":2,"on_hand":"5.000","reserved":"0.000","available":"5.000","updated_at":"2026-11-16T17:31:39.335188Z"}]}
+--- GET /api/v1/inventory/stock-levels/?low_stock=true&threshold=5 -> 200
+{"count":20,"next":null,"previous":null,"results":[{"id":2,"product":1,"warehouse":2,"on_hand":"5.000","reserved":"0.000","available":"5.000","updated_at":"2026-11-16T17:31:39.335188Z"},{"id":4,"product":2,"warehouse":2,"on_hand":"5.000","reserved":"0.000","available":"5.000","updated_at":"2026-11-16T17:31:39.343714Z"},{"id":6,"product":3,"warehouse":2,"on_hand":"5.000","reserved":"0.000","available":"5.000","updated_at":"2026-11-16T17:31:39.350030Z"},{"id":8,"product":4,"warehouse":2,"on_hand":"5.000","reserved":"0.000","available":"5.000","updated_at":"2026-11-16T17:31:39.356533Z"},{"id":10,"product":5,"warehouse":2,"on_hand":"5.000","reserved":"0.000","available":"5.000","updated_at":"202
+--- GET /api/v1/inventory/stock-movements/?page_size=2 -> 200
+{"count":40,"next":"http://localhost:8000/api/v1/inventory/stock-movements/?page=2&page_size=2","previous":null,"results":[{"id":40,"product":20,"warehouse":2,"movement_type":"RECEIPT","on_hand_delta":"5.000","reserved_delta":"0.000","reference":"SEED-ELE-005-MRK-01","reason":"","created_by":1,"created_at":"2026-11-16T17:31:39.468456Z"},{"id":39,"product":20,"warehouse":1,"movement_type":"RECEIPT","on_hand_delta":"10.000","reserved_delta":"0.000","reference":"SEED-ELE-005-CASA-01","reason":"","created_by":1,"created_at":"2026-11-16T17:31:39.465487Z"}]}
+--- GET /api/v1/users/ -> 200
+{"count":3,"next":null,"previous":null,"results":[{"id":1,"email":"demo.admin@stockflow.local","username":"demo-admin","first_name":"","last_name":"","role":"ADMIN","is_active":true,"date_joined":"2026-11-16T17:31:39.264705Z"},{"id":2,"email":"admin@stockflow.local","username":"admin@stockflow.local","first_name":"","last_name":"","role":"ADMIN","is_active":true,"date_joined":"2026-11-16T17:39:16.377610Z"},{"id":3,"email":"verify.admin@stockflow.local","username":"verify.admin@stockflow.local","first_name":"","last_name":"","role":"ADMIN","is_active":true,"date_joined":"2026-11-16T21:47:53.720136Z"}]}
+--- DELETE /api/v1/users/1/ -> 405
+{"error":{"code":"method_not_allowed","message":"Request failed.","details":{"detail":"Method \"DELETE\" not allowed."}}}
+--- POST /api/v1/catalog/products/ -> 400
+{"error":{"code":"validation_error","message":"Validation failed.","details":{"sku":["This field may not be blank."],"category":["This field is required."],"unit_price":["This field is required."]}}}
+--- GET /api/v1/sales/sales-orders/999999/ -> 404
+{"error":{"code":"request_error","message":"Request failed.","details":{"detail":"No SalesOrder matches the given query."}}}
+--- DELETE /api/v1/catalog/categories/1/ -> 409
+{"code":"resource_in_use","detail":"This category cannot be deleted because it is used by products."}
+
+
+===== 8. Sales flow: create, confirm, ship, invalid cancel, oversell =====
+--- POST /api/v1/sales/sales-orders/ -> 201
+{"id":1,"number":"SO-000001","customer":1,"customer_name":"Atlas Matériaux","warehouse":1,"warehouse_name":"Entrepôt Casablanca","status":"DRAFT","notes":"verify","created_by":3,"created_at":"2026-11-16T21:47:57.952304Z","updated_at":"2026-11-16T21:47:57.952328Z","confirmed_at":null,"shipped_at":null,"cancelled_at":null,"lines":[{"id":1,"product":1,"product_name":"Marteau","quantity":"2.000","unit_price":null,"line_total":null}],"total":null}
+--- POST /api/v1/sales/sales-orders/1/confirm/ -> 200
+{"id":1,"number":"SO-000001","customer":1,"customer_name":"Atlas Matériaux","warehouse":1,"warehouse_name":"Entrepôt Casablanca","status":"CONFIRMED","notes":"verify","created_by":3,"created_at":"2026-11-16T21:47:57.952304Z","updated_at":"2026-11-16T21:47:58.267252Z","confirmed_at":"2026-11-16T21:47:58.267188Z","shipped_at":null,"cancelled_at":null,"lines":[{"id":1,"product":1,"product_name":"Marteau","quantity":"2.000","unit_price":"85.00","line_total":"170.000"}],"total":"170.000"}
+--- GET /api/v1/inventory/stock-levels/?product=1&warehouse=1 -> 200
+{"count":1,"next":null,"previous":null,"results":[{"id":1,"product":1,"warehouse":1,"on_hand":"10.000","reserved":"2.000","available":"8.000","updated_at":"2026-11-16T21:47:58.264078Z"}]}
+--- POST /api/v1/sales/sales-orders/1/ship/ -> 200
+{"id":1,"number":"SO-000001","customer":1,"customer_name":"Atlas Matériaux","warehouse":1,"warehouse_name":"Entrepôt Casablanca","status":"SHIPPED","notes":"verify","created_by":3,"created_at":"2026-11-16T21:47:57.952304Z","updated_at":"2026-11-16T21:47:58.655261Z","confirmed_at":"2026-11-16T21:47:58.267188Z","shipped_at":"2026-11-16T21:47:58.655177Z","cancelled_at":null,"lines":[{"id":1,"product":1,"product_name":"Marteau","quantity":"2.000","unit_price":"85.00","line_total":"170.000"}],"total":"170.000"}
+--- GET /api/v1/inventory/stock-levels/?product=1&warehouse=1 -> 200
+{"count":1,"next":null,"previous":null,"results":[{"id":1,"product":1,"warehouse":1,"on_hand":"8.000","reserved":"0.000","available":"8.000","updated_at":"2026-11-16T21:47:58.653035Z"}]}
+--- POST /api/v1/sales/sales-orders/1/cancel/ -> 409
+{"error":{"code":"invalid_transition","message":"Only DRAFT or CONFIRMED orders can be cancelled.","details":{"current_status":"SHIPPED"}}}
+--- POST /api/v1/sales/sales-orders/ -> 201
+{"id":2,"number":"SO-000002","customer":1,"customer_name":"Atlas Matériaux","warehouse":1,"warehouse_name":"Entrepôt Casablanca","status":"DRAFT","notes":"","created_by":3,"created_at":"2026-11-16T21:47:59.230655Z","updated_at":"2026-11-16T21:47:59.230670Z","confirmed_at":null,"shipped_at":null,"cancelled_at":null,"lines":[{"id":2,"product":2,"product_name":"Tournevis plat","quantity":"9999.000","unit_price":null,"line_total":null}],"total":null}
+--- POST /api/v1/sales/sales-orders/2/confirm/ -> 409
+{"error":{"code":"insufficient_stock","message":"Not enough available stock.","details":{"product":2,"warehouse":1,"available":"10.000","requested_change":"9999.000"}}}
+
+
+===== 9. Purchasing flow: create, place, receive, replay, over-receipt =====
+--- POST /api/v1/purchasing/purchase-orders/ -> 201
+{"id":1,"supplier":1,"warehouse":1,"lines":[{"product":1,"quantity_ordered":"5.000","unit_cost":"10.00"}]}
+--- POST /api/v1/purchasing/purchase-orders/1/place/ -> 200
+{"id":1,"number":"PO-27CFE6543AF0","supplier":1,"supplier_name":"Fournitures Atlas","warehouse":1,"warehouse_name":"Entrepôt Casablanca","status":"ORDERED","ordered_at":"2026-11-16T21:47:59.999452Z","created_by":3,"created_at":"2026-11-16T21:47:59.664847Z","updated_at":"2026-11-16T21:47:59.999652Z","lines":[{"id":1,"product":1,"product_name":"Marteau","product_sku":"OUT-001","quantity_ordered":"5.000","quantity_received":"0.000","quantity_remaining":"5.000","unit_cost":"10.00"}]}
+--- GET /api/v1/purchasing/purchase-orders/1/ -> 200
+{"id":1,"number":"PO-27CFE6543AF0","supplier":1,"supplier_name":"Fournitures Atlas","warehouse":1,"warehouse_name":"Entrepôt Casablanca","status":"ORDERED","ordered_at":"2026-11-16T21:47:59.999452Z","created_by":3,"created_at":"2026-11-16T21:47:59.664847Z","updated_at":"2026-11-16T21:47:59.999652Z","lines":[{"id":1,"product":1,"product_name":"Marteau","product_sku":"OUT-001","quantity_ordered":"5.000","quantity_received":"0.000","quantity_remaining":"5.000","unit_cost":"10.00"}]}
+--- POST /api/v1/purchasing/purchase-orders/1/receive/ -> 201
+{"id":1,"purchase_order":1,"purchase_order_number":"PO-27CFE6543AF0","idempotency_key":"3f2b8c1e-5d4a-4e7b-9a6c-1b2d3e4f5a6b","received_by":3,"created_at":"2026-11-16T21:48:00.463377Z","lines":[{"id":1,"purchase_order_line":1,"product_name":"Marteau","product_sku":"OUT-001","quantity":"2.000"}]}
+--- POST /api/v1/purchasing/purchase-orders/1/receive/ -> 200
+{"id":1,"purchase_order":1,"purchase_order_number":"PO-27CFE6543AF0","idempotency_key":"3f2b8c1e-5d4a-4e7b-9a6c-1b2d3e4f5a6b","received_by":3,"created_at":"2026-11-16T21:48:00.463377Z","lines":[{"id":1,"purchase_order_line":1,"product_name":"Marteau","product_sku":"OUT-001","quantity":"2.000"}]}
+--- POST /api/v1/purchasing/purchase-orders/1/receive/ -> 409
+{"error":{"code":"idempotency_conflict","message":"This idempotency key was already used with another payload.","details":{}}}
+--- POST /api/v1/purchasing/purchase-orders/1/receive/ -> 409
+{"error":{"code":"over_receipt","message":"Received quantity exceeds the remaining quantity.","details":{"purchase_order_line":1,"remaining":"3.000","requested":"99.000"}}}
+
+
+===== 10. Stock adjustment and audit logs =====
+--- POST /api/v1/inventory/stock-adjustments/ -> 201
+{"id":44,"product":1,"warehouse":1,"movement_type":"ADJUSTMENT","on_hand_delta":"-1.000","reserved_delta":"0.000","reference":"","reason":"verification","created_by":3,"created_at":"2026-11-16T21:48:01.283190Z"}
+--- POST /api/v1/inventory/stock-adjustments/ -> 400
+{"error":{"code":"validation_error","message":"Validation failed.","details":{"quantity_delta":["Adjustment cannot be zero."]}}}
+--- GET /api/v1/dashboard/audit-logs/?page_size=20 -> 200
+{"count":7,"next":null,"previous":null,"results":[{"id":7,"actor":3,"actor_email":"verify.admin@stockflow.local","action":"purchase_order.received","object_type":"purchasing.PurchaseOrder","object_id":1,"payload":{"lines":[{"quantity":"2.000","purchase_order_line":1}],"number":"PO-27CFE6543AF0","status":"PARTIALLY_RECEIVED","receipt_id":1},"created_at":"2026-11-16T21:48:00.475036Z"},{"id":6,"actor":3,"actor_email":"verify.admin@stockflow.local","action":"purchase_order.placed","object_type":"purchasing.PurchaseOrder","object_id":1,"payload":{"number":"PO-27CFE6543AF0"},"created_at":"2026-11-16T21:48:00.001405Z"},{"id":5,"actor":3,"actor_email":"verify.admin@stockflow.local","action":"purchas
