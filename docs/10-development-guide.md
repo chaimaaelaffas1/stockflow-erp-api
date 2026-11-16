@@ -41,13 +41,16 @@ from django.db import models
 from django.db.models import Q
 from apps.core.models import TimestampedModel
 
+
 class Carrier(TimestampedModel):
     name = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
 
     class Meta:
         constraints = [
-            models.CheckConstraint(condition=~Q(name=""), name="carrier_name_not_empty"),
+            models.CheckConstraint(
+                condition=~Q(name=""), name="carrier_name_not_empty"
+            ),
         ]
 ```
 
@@ -70,14 +73,19 @@ from drf_spectacular.utils import extend_schema_view, extend_schema
 from apps.accounts.models import User
 from apps.accounts.permissions import HasAnyRole
 
-@extend_schema_view(list=extend_schema(tags=["Shipping - Carriers"], summary="List carriers"))
+
+@extend_schema_view(
+    list=extend_schema(tags=["Shipping - Carriers"], summary="List carriers")
+)
 class CarrierViewSet(ModelViewSet):
     queryset = Carrier.objects.all().order_by("name")
     serializer_class = CarrierSerializer
     http_method_names = ["get", "post", "patch", "head", "options"]
 
     def get_permissions(self):
-        return [HasAnyRole(User.Role.ADMIN, User.Role.STOCK_MANAGER, read_for_all=True)()]
+        return [
+            HasAnyRole(User.Role.ADMIN, User.Role.STOCK_MANAGER, read_for_all=True)()
+        ]
 ```
 
 3. **Route** it in `urls.py`: `router.register("carriers", CarrierViewSet, basename="carrier")`.
@@ -97,17 +105,24 @@ from apps.core.audit import record_audit
 from apps.core.exceptions import InvalidTransition
 from .models import Shipment
 
+
 @transaction.atomic
 def dispatch_shipment(*, shipment_id, user):
-    shipment = Shipment.objects.select_for_update().get(pk=shipment_id)   # 1. lock
-    if shipment.status != Shipment.Status.READY:                         # 2. check state
-        raise InvalidTransition("Only READY shipments can be dispatched.",
-                                {"current_status": shipment.status})
+    shipment = Shipment.objects.select_for_update().get(pk=shipment_id)  # 1. lock
+    if shipment.status != Shipment.Status.READY:  # 2. check state
+        raise InvalidTransition(
+            "Only READY shipments can be dispatched.",
+            {"current_status": shipment.status},
+        )
     # 3. change stock only through apply_stock_change(...)
-    shipment.status = Shipment.Status.DISPATCHED                          # 4. transition
+    shipment.status = Shipment.Status.DISPATCHED  # 4. transition
     shipment.save(update_fields=["status", "updated_at"])
-    record_audit(user=user, action="shipment.dispatched", obj=shipment,
-                 payload={"number": shipment.number})                    # 5. audit
+    record_audit(
+        user=user,
+        action="shipment.dispatched",
+        obj=shipment,
+        payload={"number": shipment.number},
+    )  # 5. audit
     return shipment
 ```
 
