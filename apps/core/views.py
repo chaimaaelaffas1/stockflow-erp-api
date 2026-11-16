@@ -9,6 +9,8 @@ from django.db.models import (
     Value,
 )
 from django.db.models.functions import Coalesce
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 from drf_spectacular.utils import (
     OpenApiExample,
     OpenApiParameter,
@@ -29,6 +31,17 @@ from apps.purchasing.models import PurchaseOrder
 from apps.sales.models import SalesOrder
 
 from .serializers import AuditLogSerializer, DashboardSummarySerializer
+
+
+@require_GET
+def health_check(request):
+    """
+    Check whether the API is responding.
+    """
+    return JsonResponse(
+        {"status": "ok"},
+        status=200,
+    )
 
 
 class DashboardSummaryView(APIView):
