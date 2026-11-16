@@ -8,7 +8,6 @@ from .models import StockLevel, StockMovement
 
 
 def _locked_level(product_id, warehouse_id):
-
     # Step 1: Create the stock level if it does not exist.
     # The nested atomic block creates a savepoint.
     try:
@@ -102,7 +101,6 @@ def adjust_stock(
     reason,
     user,
 ):
-
     # STEP 1: Verify the reason.
     if not reason or not reason.strip():
         raise BusinessRuleError("A reason is required for stock adjustments.")

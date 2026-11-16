@@ -77,7 +77,9 @@ def cancel_purchase_order(*, purchase_order_id, user):
             raise InvalidTransition("This purchase order cannot be cancelled.")
 
         if order.lines.filter(quantity_received__gt=0).exists():
-            raise InvalidTransition("A purchase order with received quantities cannot be cancelled.")
+            raise InvalidTransition(
+                "A purchase order with received quantities cannot be cancelled."
+            )
 
         order.status = PurchaseOrder.Status.CANCELLED
 
@@ -180,7 +182,9 @@ def receive_purchase_order(
 
         if existing_receipt:
             if existing_receipt.request_hash != request_hash:
-                raise IdempotencyConflict("This idempotency key was already used with another payload.")
+                raise IdempotencyConflict(
+                    "This idempotency key was already used with another payload."
+                )
 
             return existing_receipt, True
 
@@ -189,10 +193,16 @@ def receive_purchase_order(
             PurchaseOrder.Status.ORDERED,
             PurchaseOrder.Status.PARTIALLY_RECEIVED,
         ):
-            raise InvalidTransition("Goods can only be received for ordered purchase orders.")
+            raise InvalidTransition(
+                "Goods can only be received for ordered purchase orders."
+            )
 
         # 4. Lock all order lines in deterministic order.
-        order_lines = list(PurchaseOrderLine.objects.select_for_update().filter(purchase_order=order).order_by("product_id", "pk"))
+        order_lines = list(
+            PurchaseOrderLine.objects.select_for_update()
+            .filter(purchase_order=order)
+            .order_by("product_id", "pk")
+        )
 
         lines_by_id = {line.pk: line for line in order_lines}
 
@@ -245,7 +255,9 @@ def receive_purchase_order(
                 raise
 
             if existing_receipt.request_hash != request_hash:
-                raise IdempotencyConflict("This idempotency key was already used with another payload.")
+                raise IdempotencyConflict(
+                    "This idempotency key was already used with another payload."
+                )
 
             return existing_receipt, True
 
@@ -278,7 +290,9 @@ def receive_purchase_order(
         # 8. Recalculate the order status.
         order_lines = list(PurchaseOrderLine.objects.filter(purchase_order=order))
 
-        all_received = all(line.quantity_received == line.quantity_ordered for line in order_lines)
+        all_received = all(
+            line.quantity_received == line.quantity_ordered for line in order_lines
+        )
 
         if all_received:
             order.status = PurchaseOrder.Status.RECEIVED

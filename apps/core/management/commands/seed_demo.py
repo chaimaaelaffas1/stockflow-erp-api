@@ -165,4 +165,8 @@ class Command(BaseCommand):
                     stock_level.on_hand = quantity
                     stock_level.save(update_fields=["on_hand", "updated_at"])
 
-        self.stdout.write(self.style.SUCCESS("Données de démonstration StockFlow créées ou déjà présentes."))
+        self.stdout.write(
+            self.style.SUCCESS(
+                "Données de démonstration StockFlow créées ou déjà présentes."
+            )
+        )

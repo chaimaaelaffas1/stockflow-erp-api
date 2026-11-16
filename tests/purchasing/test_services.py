@@ -44,7 +44,6 @@ def get_stock(order, product):
 
 
 def test_place_purchase_order(purchase_order, purchaser):
-
     purchase_order.status = PurchaseOrder.Status.DRAFT
     purchase_order.save(update_fields=["status"])
 
@@ -58,7 +57,6 @@ def test_place_purchase_order(purchase_order, purchaser):
 
 
 def test_cancel_draft_order(purchase_order, purchaser):
-
     purchase_order.status = PurchaseOrder.Status.DRAFT
     purchase_order.save(update_fields=["status"])
 
@@ -76,7 +74,6 @@ def test_partial_receipt(
     stock_manager,
     product,
 ):
-
     receipt, replayed = receive(
         purchase_order,
         purchase_order_line,
@@ -110,7 +107,6 @@ def test_complete_receipt(
     purchase_order_line,
     stock_manager,
 ):
-
     receive(
         purchase_order,
         purchase_order_line,
@@ -139,7 +135,6 @@ def test_over_receipt_is_rejected(
     stock_manager,
     product,
 ):
-
     with pytest.raises(OverReceipt):
         receive(
             purchase_order,
@@ -174,7 +169,6 @@ def test_idempotent_replay(
     stock_manager,
     product,
 ):
-
     key = uuid4()
 
     first_receipt, first_replayed = receive(
@@ -223,7 +217,6 @@ def test_same_key_different_payload_is_rejected(
     purchase_order_line,
     stock_manager,
 ):
-
     key = uuid4()
 
     receive(
@@ -250,7 +243,6 @@ def test_duplicate_lines_are_aggregated(
     stock_manager,
     product,
 ):
-
     receive_purchase_order(
         purchase_order_id=purchase_order.pk,
         idempotency_key=uuid4(),
@@ -281,7 +273,6 @@ def test_duplicate_lines_over_remaining_are_rejected(
     stock_manager,
     product,
 ):
-
     with pytest.raises(OverReceipt):
         receive_purchase_order(
             purchase_order_id=purchase_order.pk,
@@ -314,7 +305,6 @@ def test_cannot_receive_cancelled_order(
     purchase_order_line,
     stock_manager,
 ):
-
     purchase_order.status = PurchaseOrder.Status.CANCELLED
     purchase_order.save(update_fields=["status"])
 
@@ -333,7 +323,6 @@ def test_cannot_cancel_after_partial_receipt(
     stock_manager,
     purchaser,
 ):
-
     receive(
         purchase_order,
         purchase_order_line,
@@ -354,7 +343,6 @@ def test_receipt_creates_stock_level(
     stock_manager,
     product,
 ):
-
     assert not StockLevel.objects.filter(
         product=product,
         warehouse=purchase_order.warehouse,

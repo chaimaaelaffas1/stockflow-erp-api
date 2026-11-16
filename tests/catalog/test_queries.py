@@ -32,6 +32,11 @@ def test_product_list_uses_join_for_category(
 
     assert response.status_code == 200
 
-    product_selects = [query["sql"].lower() for query in queries.captured_queries if "select" in query["sql"].lower() and "catalog_product" in query["sql"].lower()]
+    product_selects = [
+        query["sql"].lower()
+        for query in queries.captured_queries
+        if "select" in query["sql"].lower()
+        and "catalog_product" in query["sql"].lower()
+    ]
 
     assert any("join" in query for query in product_selects)

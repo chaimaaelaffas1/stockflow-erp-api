@@ -27,7 +27,6 @@ class TestConfirmSalesOrder:
         product,
         warehouse,
     ):
-
         order = sales_order_factory(quantity="3.000")
 
         result = confirm_sales_order(order.pk, sales_user)
@@ -66,7 +65,6 @@ class TestConfirmSalesOrder:
         sales_order_factory,
         sales_user,
     ):
-
         order = sales_order_factory(with_lines=False)
 
         with pytest.raises(BusinessRuleError):
@@ -85,7 +83,6 @@ class TestConfirmSalesOrder:
         category,
         stock_level,
     ):
-
         second_product = Product.objects.create(
             sku="TEST-002",
             name="Deuxième produit",
@@ -123,7 +120,6 @@ class TestConfirmSalesOrder:
         sales_user,
         stock_level,
     ):
-
         order = sales_order_factory(quantity="2.000")
 
         confirm_sales_order(order.pk, sales_user)
@@ -145,7 +141,6 @@ class TestConfirmSalesOrder:
         product,
         stock_level,
     ):
-
         order = sales_order_factory(quantity="2.000")
 
         original_price = product.unit_price
@@ -171,7 +166,6 @@ class TestShipSalesOrder:
         sales_user,
         stock_level,
     ):
-
         order = sales_order_factory(quantity="3.000")
 
         confirm_sales_order(order.pk, sales_user)
@@ -205,7 +199,6 @@ class TestShipSalesOrder:
         sales_order_factory,
         sales_user,
     ):
-
         order = sales_order_factory()
 
         with pytest.raises(InvalidTransition):
@@ -221,7 +214,6 @@ class TestShipSalesOrder:
         sales_user,
         stock_level,
     ):
-
         order = sales_order_factory(quantity="2.000")
 
         # Première étape : confirmer la commande.
@@ -247,7 +239,6 @@ class TestCancelSalesOrder:
         sales_user,
         stock_level,
     ):
-
         order = sales_order_factory(quantity="2.000")
 
         result = cancel_sales_order(order.pk, sales_user)
@@ -273,7 +264,6 @@ class TestCancelSalesOrder:
         sales_user,
         stock_level,
     ):
-
         order = sales_order_factory(quantity="4.000")
 
         confirm_sales_order(order.pk, sales_user)
@@ -309,7 +299,6 @@ class TestCancelSalesOrder:
         sales_user,
         stock_level,
     ):
-
         order = sales_order_factory(quantity="2.000")
 
         confirm_sales_order(order.pk, sales_user)

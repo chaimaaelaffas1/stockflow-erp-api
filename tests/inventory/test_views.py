@@ -18,7 +18,6 @@ def test_stock_level_list(
     user,
     api_client_for,
 ):
-
     client = api_client_for(user)
     url = reverse("stock-level-list")
     response = client.get(url)
@@ -33,7 +32,6 @@ def test_stock_adjustment_by_stock_manager(
     user_factory,
     api_client_for,
 ):
-
     manager = user_factory(role=User.Role.STOCK_MANAGER)
 
     client = api_client_for(manager)
@@ -68,7 +66,6 @@ def test_stock_adjustment_forbidden_for_viewer(
     user_factory,
     api_client_for,
 ):
-
     viewer = user_factory(role=User.Role.VIEWER)
 
     client = api_client_for(viewer)
@@ -96,7 +93,6 @@ def test_stock_movement_is_read_only(
     user,
     api_client_for,
 ):
-
     client = api_client_for(user)
     url = reverse("stock-movement-list")
     response = client.post(

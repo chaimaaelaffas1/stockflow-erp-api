@@ -20,7 +20,12 @@ class IsAdminRole(BasePermission):
     def has_permission(self, request, view):
         user = request.user
 
-        return bool(user and user.is_authenticated and user.is_active and user.role == user.Role.ADMIN)
+        return bool(
+            user
+            and user.is_authenticated
+            and user.is_active
+            and user.role == user.Role.ADMIN
+        )
 
 
 def HasAnyRole(*roles, read_for_all=False):

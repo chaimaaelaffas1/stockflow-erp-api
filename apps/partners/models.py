@@ -24,10 +24,7 @@ class BasePartner(TimestampedModel):
         blank=True,
         null=True,
     )
-    address = models.TextField(
-        blank=True,
-        default=""
-    )
+    address = models.TextField(blank=True, default="")
     is_active = models.BooleanField(
         default=True,
     )

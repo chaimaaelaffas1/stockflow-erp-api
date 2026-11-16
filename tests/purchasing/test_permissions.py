@@ -13,7 +13,6 @@ def test_purchaser_can_create_purchase_order(
     supplier,
     warehouse,
 ):
-
     purchaser = user_factory(
         email="purchaser-api@atlas.ma",
         role=User.Role.PURCHASER,
@@ -40,7 +39,6 @@ def test_viewer_cannot_create_purchase_order(
     supplier,
     warehouse,
 ):
-
     viewer = user_factory(
         email="viewer-api@atlas.ma",
         role=User.Role.VIEWER,
@@ -66,7 +64,6 @@ def test_purchaser_cannot_receive_goods(
     purchaser,
     purchase_order,
 ):
-
     client = api_client_for(purchaser)
 
     response = client.post(

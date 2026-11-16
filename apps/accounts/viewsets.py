@@ -65,7 +65,6 @@ from .serializers import UserSerializer
     ),
 )
 class UserViewSet(ModelViewSet):
-
     queryset = User.objects.all().order_by("id")
     serializer_class = UserSerializer
     permission_classes = [IsAdminRole]

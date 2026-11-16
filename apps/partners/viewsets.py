@@ -93,7 +93,11 @@ class CustomerViewSet(ModelViewSet):
 
         return [permission() for permission in classes]
 
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_fields = ["is_active"]
     search_fields = ["name", "email", "phone"]
     ordering_fields = ["name", "created_at"]
@@ -107,7 +111,10 @@ class CustomerViewSet(ModelViewSet):
                 {
                     "error": {
                         "code": "resource_in_use",
-                        "message": ("This customer cannot be deleted because it has existing sales orders."),
+                        "message": (
+                            "This customer cannot be deleted because "
+                            "it has existing sales orders."
+                            ),
                         "details": {},
                     }
                 },
@@ -201,7 +208,11 @@ class SupplierViewSet(ModelViewSet):
 
         return [permission() for permission in classes]
 
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        filters.SearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_fields = ["is_active"]
     search_fields = ["name", "email", "phone"]
     ordering_fields = ["name", "created_at"]
@@ -215,7 +226,10 @@ class SupplierViewSet(ModelViewSet):
                 {
                     "error": {
                         "code": "resource_in_use",
-                        "message": ("This supplier cannot be deleted because it has existing purchase orders."),
+                        "message": (
+                            "This supplier cannot be deleted "
+                            "because it has existing purchase orders."
+                            ),
                         "details": {},
                     }
                 },

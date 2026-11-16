@@ -26,7 +26,9 @@ class Product(TimestampedModel):
     sku = models.CharField(max_length=40)
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, default="")
-    category = models.ForeignKey("catalog.Category", on_delete=models.PROTECT, related_name="products")
+    category = models.ForeignKey(
+        "catalog.Category", on_delete=models.PROTECT, related_name="products"
+    )
     unit_price = models.DecimalField(max_digits=12, decimal_places=2)
     is_active = models.BooleanField(default=True)
     reorder_level = models.DecimalField(

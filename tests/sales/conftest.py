@@ -69,7 +69,6 @@ def customer(db):
 
 @pytest.fixture
 def stock_level(db, product, warehouse):
-
     return StockLevel.objects.create(
         product=product,
         warehouse=warehouse,
@@ -91,7 +90,6 @@ def sales_order_factory(
     product,
     sales_user,
 ):
-
     def make_order(
         quantity="2.000",
         with_lines=True,
@@ -100,7 +98,6 @@ def sales_order_factory(
         order_warehouse=None,
         order_product=None,
     ):
-
         order = SalesOrder.objects.create(
             customer=order_customer or customer,
             warehouse=order_warehouse or warehouse,

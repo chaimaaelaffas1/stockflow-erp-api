@@ -129,7 +129,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                     "code": "resource_in_use",
-                    "detail": ("This category cannot be deleted because it is used by products."),
+                    "detail": (
+                        "This category cannot be deleted because "
+                        "it is used by products."
+                    ),
                 },
                 status=status.HTTP_409_CONFLICT,
             )

@@ -73,9 +73,6 @@ def test_concurrent_receipts_never_over_receive(
     assert purchase_order_line.quantity_received == 15
 
 
-
-
-
 @pytest.mark.slow
 @pytest.mark.django_db(transaction=True)
 def test_concurrent_receipts_same_key_create_one_receipt(
@@ -90,9 +87,7 @@ def test_concurrent_receipts_same_key_create_one_receipt(
         connections.close_all()
 
         try:
-            user = get_user_model().objects.get(
-                pk=stock_manager.pk
-            )
+            user = get_user_model().objects.get(pk=stock_manager.pk)
 
             receipt, replayed = receive_purchase_order(
                 purchase_order_id=purchase_order.pk,
@@ -127,15 +122,17 @@ def test_concurrent_receipts_same_key_create_one_receipt(
     outcomes = [results.get_nowait() for _ in threads]
 
     assert all(
-        not (isinstance(item, tuple) and item[0] == "error")
-        for item in outcomes
+        not (isinstance(item, tuple) and item[0] == "error") for item in outcomes
     )
 
     assert outcomes[0][0] == outcomes[1][0]
 
     assert sorted(item[1] for item in outcomes) == [False, True]
 
-    assert Receipt.objects.filter(
-        purchase_order=purchase_order,
-        idempotency_key=key,
-    ).count() == 1
+    assert (
+        Receipt.objects.filter(
+            purchase_order=purchase_order,
+            idempotency_key=key,
+        ).count()
+        == 1
+    )
